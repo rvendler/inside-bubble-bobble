@@ -6,13 +6,11 @@ verified against a cycle-exact emulator and a routine-by-routine port of all fou
 
 ## Read it
 
-* **[inside-bubble-bobble.html](inside-bubble-bobble.html)** — the whole article as one standalone page, every image embedded (1.2 MB). Download it and open it, or read the published copy on GitHub Pages if this repository has it enabled.
-* **[inside-bubble-bobble.md](inside-bubble-bobble.md)** — the same text as one Markdown file.
+* **[inside-bubble-bobble.md](inside-bubble-bobble.md)** — the whole article as one Markdown file.
 * **[chapters/](chapters/)** — one file per chapter, readable directly on GitHub.
 
-The chapters are the source. After editing them, run `python3 build.py` to regenerate the single Markdown file and
-the standalone HTML (`inside-bubble-bobble.html` and its copy `index.html`). Info boxes are written as GitHub notes —
-a blockquote that starts with `> [!NOTE]` and a bold title line — and become shaded boxes in the HTML.
+The chapters are the source. After editing them, run `python3 build.py` to regenerate the single Markdown file.
+Info boxes are written as GitHub notes: a blockquote that starts with `> [!NOTE]`, then a bold title line.
 
 ## Contents
 
