@@ -145,23 +145,116 @@ along its moving side — are the subject of chapter 15.
 
 ## Drawing the walls
 
-The walls are not a separate drawing; they are the map made visible. When a round is set up, the strips of the
-off-screen playfield are cleared and `round_scroll_step` (`$18EE`) draws them one tile row per call, or all 32 at
-once when `$E5C3` is zero. Each call runs three
-passes over the map row:
+The walls are not a separate drawing; they are the map made visible. Three address spaces are involved: the
+collision map, a nibble per cell; the video RAM of playfield A, a two-byte cell per tile; and the sixteen object
+entries whose strips put those columns on screen. `round_scroll_step` (`$18EE`) walks them one map row at a time,
+32 calls per round — all in one go when `$E5C3` is zero, otherwise one call every four frames during the scroll.
 
-1. `scroll_draw_walls` (`$1958`) puts the round's wall tile into every cell whose nibble is zero. The tile comes
-   from `wall_tile_base`: `round x 5 + $0204`, so each round has its own set of five consecutive tiles in bank 0
-   (four patterned blocks and a plain one, chapter 4), and the attribute byte is `$38` on even rounds and `$3C` on
-   odd ones — colour group 14 or 15. Alternating the group is what lets two rounds be on screen at the same time
-   during the scroll with different colours: `load_round_palette` fills the other group while the old one is still
-   visible.
-2. `scroll_shade_walls` (`$199C`) looks at the empty cells next to solid ones and writes the edge tiles `$F0-$F5`
-   into them, which gives the platforms their lit top edge and shaded underside.
-3. `scroll_cap_columns` fixes the cells at the top of each strip, where the border meets the status row.
+![The three address spaces and the four passes over a map row.](../img/ch06-map-to-screen.svg)
 
-The pass runs at 32 rows per round; with the scroll enabled, that is a 32-frame reveal of the new round while the
-old one is pushed off. The two playfields of chapter 5 exist for this half-second.
+The arithmetic is short because the video RAM was laid out for it. Map row r is sixteen bytes at `$E398 + 16r`,
+two cells per byte. Tile column c of playfield A is the 64-byte half-column at `$CD00 + 64c`, and its row r is the
+two bytes at `+2r`. So one map row maps onto the same offset `2r` in each of the 32 half-columns, and each pass is
+a loop of 32 steps of `$40`:
+
+```asm
+scroll_draw_walls:            ; the fill pass for map row (scroll_column)
+1958  LD A,(scroll_column)
+195B  PUSH AF
+195C  LD B,$10
+195E  CALL mul8x8             ; HL = row x 16
+1961  LD DE,collision_map
+1964  ADD HL,DE               ; -> the sixteen bytes of the row
+1965  POP AF
+1966  ADD A,A
+1967  LD E,A
+1968  LD D,$00
+196A  LD IY,$CD00
+196E  ADD IY,DE               ; -> cell (row, column 0) in video RAM
+1970  LD B,$10                ; sixteen bytes ...
+loc_1972:
+1972  PUSH BC
+1973  LD B,$02                ; ... of two nibbles each
+1975  LD A,(HL)
+loc_1976:
+1976  LD C,A
+1977  AND $F0                 ; the high nibble: 0 = solid
+1979  LD A,C
+197A  JR NZ,loc_198D          ; air: leave the cell as the clear pass left it
+197C  EX AF,AF'
+197D  EXX
+197E  CALL wall_tile_base     ; HL = the round's tile word
+1981  INC HL
+1982  INC HL
+1983  INC HL
+1984  INC HL                  ; + 4: the plain block
+1985  LD (IY+$00),L
+1988  LD (IY+$01),H
+198B  EXX
+198C  EX AF,AF'
+loc_198D:
+198D  CALL shl4               ; the low nibble up
+1990  LD DE,$0040
+1993  ADD IY,DE               ; next tile column
+1995  DJNZ loc_1976
+1997  INC HL
+1998  POP BC
+1999  DJNZ loc_1972
+199B  RET
+```
+
+Each call runs four passes over the row:
+
+1. `scroll_clear_column` zeroes the row's 32 cells.
+2. `scroll_draw_walls`, above, puts the round's **plain block** into every cell whose nibble is zero.
+3. `scroll_shade_walls` (`$199C`) looks at each *empty* cell's three neighbours above, to the left and above-left
+   — the row above is at `-2`, the column to the left at `-$40` — and, when any of them is the plain block, writes
+   one of the six edge tiles. The shadow therefore falls below and to the right of every wall. Which tile:
+
+| Above | Left | Above-left | Tile | What it draws |
+| --- | --- | --- | --- | --- |
+| wall | wall | — | `$F0` | The inner corner: shadow along the top and the left |
+| — | wall | air | `$F1` | A left strip whose top tapers, where the wall beside it begins |
+| wall | air | wall | `$F2` | A top strip running to the left edge |
+| air | air | wall | `$F3` | The small corner cast by a diagonal neighbour |
+| air | wall | wall | `$F4` | A full left strip |
+| wall | air | air | `$F5` | A top strip starting a little in from the corner |
+
+![The six edge tiles, in round 1's colours.](../img/ch06-edge-tiles.png)
+
+4. `scroll_cap_columns` runs *two rows behind* the others and only on the two outer tile columns of each side: it
+   replaces the plain blocks there with the round's 2 × 2 patterned block, tiles base + 0 and 1 on even rows, 2 and
+   3 on odd ones. That is why the left and right borders show the big pattern while the platforms inside are the
+   plain block, and the two-row lag is so that the shading pass, which looks for the plain tile, still finds it
+   next to the border when it gets there. When the first row is done the same routine also patches two cells of
+   the top border by the layout byte's bits 5 and 7, the gaps in the ceiling of the rounds that have them.
+
+### The hundred tile sets
+
+Each round has its own five tiles in graphics bank 0, at `$0204 + 5 × (round − 1)`: the four quarters of the
+patterned block and the plain block. `wall_tile_base` (`$1929`) forms the tile word, with the attribute `$38` for
+even rounds and `$3C` for odd ones — colour group 14 or 15 — so that the outgoing and the incoming round can be on
+screen together in different colours: `load_round_palette` fills the other group with the 32-byte scheme the round
+record's first byte names (eight schemes at `1:$8200`) while the old one is still visible.
+
+![All hundred wall sets, each in its own round's palette scheme: the 2 × 2 patterned block, the plain block, and
+the five tiles in ROM order. The label gives the round and the palette scheme.](../img/ch06-wall-sets.png)
+
+The sets are graphics, not rules: the fill pass never looks at which round it is beyond the arithmetic above, and
+the designers used the freedom — 100 different patterns from 500 tiles, in eight palettes.
+
+### The scroll
+
+`round_intro` (`$0A12`) drives the transition. The status row is copied into playfield B and B's strips are
+placed; `scroll_animate` is set; then, unless this is the first round of a game, a demo, or a secret room's
+return (`skip_round_intro`), the loop at `$0A47` runs 128 frames: every frame it adds 2 to the line byte of each
+of A's sixteen entries — 8 at a game over's round skip — and every time the first entry's line byte is a multiple
+of 8 it calls `round_scroll_step` for the next row. When the line byte wraps to zero the strips are back where
+they started, now holding the new round, and `swap_playfield_out` brings the status row home. The rows drawn are
+the ones that have just left the top: each comes back in at the bottom carrying the next round.
+
+![The scroll, every sixteenth frame: round 1 rides up and off, round 2 rides in from below, and the status row
+stays where it is on playfield B.](../img/ch06-scroll.png)
 
 ![Round 20 as played: the layout is a mirrored pair of figures, with the wall tiles and colour scheme of that round.](../img/ch06-round20.png)
 

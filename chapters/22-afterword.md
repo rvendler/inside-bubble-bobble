@@ -96,8 +96,8 @@ the measurement, and the sub CPU's cost per bubble was found by counting.
 ## The tools of this article
 
 The figures were rendered by a handful of scripts in `tools/book/`: `shot.ts` for screenshots, `sheet.ts`
-for the contact sheets of frames and the cropped strips, `tiles.ts` and `itemsheet.ts` for the graphics
-sheets, `maps.ts` for the hundred rounds with their current arrows, `busychart.ts` and `jumparc.ts` for the
+for the contact sheets of frames and the cropped strips, `gfx.ts`, `sprites.ts`, `itemsheet.ts` and `wallsets.ts` for the
+graphics sheets, `maps.ts` for the hundred rounds with their current arrows, `busychart.ts` and `jumparc.ts` for the
 measured plots, and `build.ts`, which joins the chapters into one Markdown file and one HTML file with every
 image embedded. The measurements came from throwaway scripts on the same emulator: a per-frame trace of
 which routine the main CPU was in, the sub CPU's cycles per handler run, the MCU's per-service costs. The

@@ -124,12 +124,19 @@ The 90 entries are allocated by convention:
 | 16-65 | `$E20D` | Sprites: 24 bubbles first, then enemies, items, panels and the players, in slots of the low columns 0-25 |
 | 66-89 | `$E2D5` | Playfield B: sixteen strips in high columns `$0A-$19` (`$D500-$DCFF`), which the round scroll moves about within this range; the part not in use holds Skel-Monsta's sprites |
 
-There are two playfields because the round intro scrolls. When a round ends, the next round's walls are drawn into
-the playfield that is off screen (`round_scroll_step`, one tile row across all sixteen strips per call, or all 32 rows at once when `$E5C3` says the
-scroll is skipped), and the strips of the old playfield are then moved off while the new ones move on. `$E352`
-records which half is current so that text, scores and the wall-shading routines print into the right columns. The
-two sets of columns are the reason the video RAM is 58 columns rather than 32: sixteen strips twice, plus 26
-columns for sprites and panels.
+There are two playfields because the round intro scrolls, but not in the way the word suggests. The sixteen
+strips of playfield A are 256 lines tall on a 256-line plane, so each is a ring: raise its line byte and the rows
+that leave at the top come back in at the bottom. The scroll rotates the sixteen rings by two pixels a frame for
+128 frames, and while a row is out of sight `round_scroll_step` clears it and draws the next round's map row into
+it, one row every four frames. The old round rides up and off, the new round rides in from below, and both live in
+the same columns the whole time. Playfield B exists for the status row: at the start of the scroll the two text
+rows of the score line are copied from A's columns into B's (`swap_playfield_in`, `$CD04` to `$D504`, four bytes per
+tile column), B's sixteen entries are at fixed positions so the scores stay still while the walls move, and at the
+end the text is copied back and B is cleared (`swap_playfield_out`). `$E352` records which half holds the status
+row so that the score printers write into the right columns. Once the round starts, B's entries are cleared
+altogether (`clear_init_object_list2`), and the range is free for Skel-Monsta's records. The two sets of columns
+are the reason the video RAM is 58 columns rather than 32: sixteen strips twice, plus 26 columns for sprites and
+panels. Chapter 6 shows the scroll frame by frame.
 
 `init_object_list` shows the fixed part of the scheme: it clears the spare entries and writes playfield B's
 sixteen entries from a table of shape/column and x bytes:

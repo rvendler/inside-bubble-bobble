@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="420" fill="#181818"/>
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#c0c0c0"/></marker></defs>
+  <text x="20" y="24" fill="#ffffff" font-size="13">From a map cell to the screen: the three address spaces round_scroll_step walks for map row r, column c</text>
+  <!-- map -->
+  <g fill="#e0e0e0" font-size="11">
+    <text x="30" y="60" fill="#ffffff">the collision map, $E398</text>
+    <text x="30" y="76" fill="#a0a0a0">32 rows x 16 bytes, a nibble per cell</text>
+    <g stroke="#606060" fill="#2c2c2c">
+      <rect x="30" y="86" width="192" height="96"/>
+    </g>
+    <g stroke="#404040" stroke-width="0.5">
+      <line x1="30" y1="110" x2="222" y2="110"/><line x1="30" y1="134" x2="222" y2="134"/><line x1="30" y1="158" x2="222" y2="158"/>
+    </g>
+    <rect x="102" y="110" width="12" height="24" fill="#c04040"/>
+    <text x="30" y="200">row r: byte $E398 + 16 r</text>
+    <text x="30" y="216">cell c: byte + c/2, high nibble if c is even</text>
+    <text x="30" y="232">0 = solid</text>
+  </g>
+  <!-- video ram -->
+  <g fill="#e0e0e0" font-size="11">
+    <text x="330" y="60" fill="#ffffff">video RAM, playfield A: $CD00-$D4FF</text>
+    <text x="330" y="76" fill="#a0a0a0">32 tile columns of 64 bytes (a 2-byte cell per row)</text>
+    <g stroke="#606060" fill="#2c2c2c">
+      <rect x="330" y="86" width="256" height="96"/>
+    </g>
+    <g stroke="#404040" stroke-width="0.5">
+      <line x1="346" y1="86" x2="346" y2="182"/><line x1="362" y1="86" x2="362" y2="182"/><line x1="378" y1="86" x2="378" y2="182"/><line x1="394" y1="86" x2="394" y2="182"/>
+      <line x1="410" y1="86" x2="410" y2="182"/><line x1="426" y1="86" x2="426" y2="182"/><line x1="442" y1="86" x2="442" y2="182"/>
+    </g>
+    <rect x="426" y="110" width="16" height="8" fill="#c04040"/>
+    <text x="330" y="200">tile column c: $CD00 + 64 c</text>
+    <text x="330" y="216">row r: + 2 r (tile number, then attribute)</text>
+    <text x="330" y="232">two tile columns = one 128-byte object column</text>
+  </g>
+  <!-- object entries -->
+  <g fill="#e0e0e0" font-size="11">
+    <text x="660" y="60" fill="#ffffff">the object list, entries 0-15</text>
+    <text x="660" y="76" fill="#a0a0a0">one strip per object column $1A-$29</text>
+    <g stroke="#606060" fill="#2c2c2c">
+      <rect x="660" y="86" width="208" height="96"/>
+    </g>
+    <g stroke="#404040" stroke-width="0.5">
+      <line x1="673" y1="86" x2="673" y2="182"/><line x1="686" y1="86" x2="686" y2="182"/><line x1="699" y1="86" x2="699" y2="182"/><line x1="712" y1="86" x2="712" y2="182"/><line x1="725" y1="86" x2="725" y2="182"/>
+    </g>
+    <rect x="699" y="110" width="13" height="8" fill="#c04040"/>
+    <text x="660" y="200">strip s = c / 2: entry s at $E1CD + 4 s</text>
+    <text x="660" y="216">[line, $DB + s, 0, bank]: chained x, 16 px each</text>
+    <text x="660" y="232">line byte: 0 at rest, + 2 per frame of the scroll</text>
+  </g>
+  <g stroke="#c0c0c0" stroke-width="1.2" fill="none" marker-end="url(#a)">
+    <path d="M226,122 L326,122"/>
+    <path d="M590,122 L656,122"/>
+  </g>
+  <g fill="#c0c0c0" font-size="10">
+    <text x="236" y="116">nibble 0 -></text><text x="236" y="128">plain wall tile</text>
+    <text x="596" y="116">64 bytes -></text><text x="596" y="128">one tile column</text>
+  </g>
+  <g fill="#e0e0e0" font-size="11">
+    <text x="30" y="272" fill="#ffffff">Per map row, three passes over the 32 cells:</text>
+    <text x="30" y="290">1  scroll_clear_column   zero the row's 32 cells</text>
+    <text x="30" y="306">2  scroll_draw_walls     nibble 0 -> the round's plain block (tile base + 4, colour group 14 or 15 by round parity)</text>
+    <text x="30" y="322">3  scroll_shade_walls    an empty cell with a plain block above and/or to the left gets one of the edge tiles $F0-$F5</text>
+    <text x="30" y="338">4  scroll_cap_columns    two rows behind: the two border columns' plain blocks become the 2 x 2 pattern (tiles base + 0..3)</text>
+    <text x="30" y="366" fill="#a0a0a0">The clear-and-draw runs on the row that has just left the top of the strips, which are 256-line rings: the row comes back in at the bottom</text>
+    <text x="30" y="382" fill="#a0a0a0">carrying the next round. The status row rides on playfield B's sixteen fixed strips for the 128 frames of the scroll, and moves back afterwards.</text>
+  </g>
+</svg>
