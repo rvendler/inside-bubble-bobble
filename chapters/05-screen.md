@@ -125,7 +125,7 @@ The 90 entries are allocated by convention:
 | 66-89 | `$E2D5` | Playfield B: sixteen strips in high columns `$0A-$19` (`$D500-$DCFF`), which the round scroll moves about within this range; the part not in use holds Skel-Monsta's sprites |
 
 There are two playfields because the round intro scrolls. When a round ends, the next round's walls are drawn into
-the playfield that is off screen (`round_scroll_step`, one strip per frame, or all at once when `$E5C3` says the
+the playfield that is off screen (`round_scroll_step`, one tile row across all sixteen strips per call, or all 32 rows at once when `$E5C3` says the
 scroll is skipped), and the strips of the old playfield are then moved off while the new ones move on. `$E352`
 records which half is current so that text, scores and the wall-shading routines print into the right columns. The
 two sets of columns are the reason the video RAM is 58 columns rather than 32: sixteen strips twice, plus 26
