@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="420" fill="#181818"/>
+  <text x="20" y="24" fill="#ffffff" font-size="13">The enemy geometry service, on the values of play frame 1500: player 1 at x = 112, y = 82; enemy record 1 at x = 32, y = 201</text>
+  <!-- playfield: 256 wide (y, horizontal), 256 tall (x, vertical, up). scale 1.2 px per unit; origin bottom-left at (60, 380) -->
+  <rect x="60" y="72" width="307" height="308" fill="#101820" stroke="#405060"/>
+  <text x="60" y="396" fill="#909090" font-size="10">y = 0</text>
+  <text x="340" y="396" fill="#909090" font-size="10">y = 255</text>
+  <text x="14" y="380" fill="#909090" font-size="10">x = 0</text>
+  <text x="14" y="80" fill="#909090" font-size="10">x = 255</text>
+  <!-- player at y=82 -> px = 60 + 82*1.2 = 158; x=112 -> py = 380 - 112*1.2 = 246 -->
+  <rect x="150" y="238" width="16" height="16" fill="#40c040"/>
+  <text x="120" y="232" fill="#a0ffa0" font-size="11">player (112, 82)</text>
+  <!-- enemy at y=201 -> px = 60 + 241 = 301; x=32 -> py = 380 - 38 = 342 -->
+  <rect x="293" y="334" width="16" height="16" fill="#e05050"/>
+  <text x="255" y="366" fill="#ffb0b0" font-size="11">enemy (32, 201)</text>
+  <!-- dx: vertical distance from enemy up to player -->
+  <line x1="301" y1="334" x2="301" y2="254" stroke="#ffe080" stroke-dasharray="3,3"/>
+  <line x1="158" y1="254" x2="301" y2="254" stroke="#ffe080" stroke-dasharray="3,3"/>
+  <text x="306" y="298" fill="#ffe080" font-size="11">|dx| = 112 - 32 = 80</text>
+  <text x="180" y="270" fill="#ffe080" font-size="11">|dy| = 201 - 82 = 119</text>
+  <!-- legend / record -->
+  <g font-size="11" fill="#e0e0e0">
+    <text x="400" y="90" fill="#ffffff">For each record with flags bit 0 set, and for each player that is active:</text>
+    <text x="400" y="112">d = player.x - enemy.x</text>
+    <text x="400" y="128">dir x = $00 if d &gt;= 0 (the player is level or higher), $01 if d &lt; 0 (lower), $80 if d = 0</text>
+    <text x="400" y="144">|dx| = |d|</text>
+    <text x="400" y="166">d = player.y - enemy.y</text>
+    <text x="400" y="182">dir y = $00 if d &gt;= 0 (the player is level or to the right), $01 if to the left, $80 if equal</text>
+    <text x="400" y="198">|dy| = |d|</text>
+    <text x="400" y="220">if |dx| &lt; 8 and |dy| &lt; 8: touch report = 1, index; stop scanning</text>
+    <text x="400" y="250" fill="#ffffff">Result record 1 at $FC2F (8 bytes, player 1 in the even bytes):</text>
+    <g font-family="monospace" font-size="12">
+      <text x="400" y="272" fill="#ffa0ff">00  00  01  00  50  00  76  00</text>
+      <text x="400" y="290" fill="#c0c0c0">dirx dirx diry diry |dx| |dx| |dy| |dy|</text>
+      <text x="400" y="306" fill="#c0c0c0">P1   P2   P1   P2   P1   P2   P1   P2</text>
+    </g>
+    <text x="400" y="334">The player is higher (dir x = 0) and to the left (dir y = 1), 80 lines up and</text>
+    <text x="400" y="350">118 pixels across: the MCU used the player's position of the previous frame.</text>
+    <text x="400" y="372" fill="#a0a0a0">Player 2 is not active, so its bytes keep their last values.</text>
+  </g>
+</svg>

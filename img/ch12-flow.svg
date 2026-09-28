@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="440" fill="#181818"/>
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#c0c0c0"/></marker></defs>
+  <text x="20" y="24" fill="#ffffff" font-size="13">Game flow: the states of task 0, with task 1 (attract) and task 2 (a round) as its helpers</text>
+  <g stroke="#c0c0c0" stroke-width="1.2" fill="none" marker-end="url(#a)">
+    <path d="M110,90 L110,130"/>
+    <path d="M110,170 L110,210"/>
+    <path d="M110,250 L110,290"/>
+    <path d="M110,330 L110,370"/>
+    <path d="M210,390 L300,390"/>
+    <path d="M460,390 L550,390"/>
+    <path d="M630,370 L630,330"/>
+    <path d="M630,290 L630,250"/>
+    <path d="M550,310 L460,310"/>
+    <path d="M550,230 L500,230 L500,350 L380,350 L380,370" stroke-dasharray="4,3"/>
+    <path d="M710,230 L790,230"/>
+    <path d="M300,310 L250,310 L250,230 L190,230" stroke-dasharray="4,3"/>
+    <path d="M210,150 L300,150"/>
+    <path d="M460,150 L460,100 L200,100" stroke-dasharray="4,3"/>
+    <path d="M630,170 L630,210" stroke-dasharray="4,3"/>
+    <path d="M700,150 L790,150"/>
+  </g>
+  <g fill="#e0e0e0" font-size="11" text-anchor="middle">
+    <rect x="30" y="50" width="160" height="40" rx="6" fill="#2c2c2c" stroke="#808080"/><text x="110" y="68">boot (chapter 3)</text><text x="110" y="82">task 0 started</text>
+    <rect x="30" y="130" width="160" height="40" rx="6" fill="#3a5a3a" stroke="#80c080"/><text x="110" y="148">no credits:</text><text x="110" y="162">attract mode (task 1)</text>
+    <rect x="30" y="210" width="160" height="40" rx="6" fill="#3a3a5a" stroke="#8080c0"/><text x="110" y="228">credits: title, PUSH</text><text x="110" y="242">1P/2P BUTTON, wait</text>
+    <rect x="30" y="290" width="160" height="40" rx="6" fill="#3a3a5a" stroke="#8080c0"/><text x="110" y="308">SELECT GAME MODE</text><text x="110" y="322">normal / super (1200 fr)</text>
+    <rect x="30" y="370" width="160" height="40" rx="6" fill="#3a3a5a" stroke="#8080c0"/><text x="110" y="388">story intro, 480 frames</text><text x="110" y="402">new-game set-up</text>
+    <rect x="300" y="370" width="160" height="40" rx="6" fill="#5a5a3a" stroke="#c0c080"/><text x="380" y="388">round n: task 2</text><text x="380" y="402">(task 0 sleeps)</text>
+    <rect x="550" y="370" width="160" height="40" rx="6" fill="#5a5a3a" stroke="#c0c080"/><text x="630" y="388">round over:</text><text x="630" y="402">task 0 woken</text>
+    <rect x="550" y="290" width="160" height="40" rx="6" fill="#5a5a3a" stroke="#c0c080"/><text x="630" y="308">any player left?</text><text x="630" y="322">(none: game over)</text>
+    <rect x="550" y="210" width="160" height="40" rx="6" fill="#5a5a3a" stroke="#c0c080"/><text x="630" y="228">rank by rounds, minutes;</text><text x="630" y="242">round + 1 (100: the ending)</text>
+    <rect x="300" y="290" width="160" height="40" rx="6" fill="#5a3a3a" stroke="#c08080"/><text x="380" y="308">game over: high score,</text><text x="380" y="322">results, GAME OVER</text>
+    <rect x="790" y="210" width="100" height="40" rx="6" fill="#5a3a5a" stroke="#c080c0"/><text x="840" y="228">the ending</text><text x="840" y="242">(chapter 19)</text>
+    <rect x="300" y="130" width="160" height="40" rx="6" fill="#3a5a3a" stroke="#80c080"/><text x="380" y="148">title 390 fr + codes,</text><text x="380" y="162">instructions demo</text>
+    <rect x="550" y="130" width="150" height="40" rx="6" fill="#3a5a3a" stroke="#80c080"/><text x="625" y="148">demo round,</text><text x="625" y="162">1320 frames</text>
+    <rect x="790" y="130" width="100" height="40" rx="6" fill="#3a5a3a" stroke="#80c080"/><text x="840" y="148">high scores,</text><text x="840" y="162">then repeat</text>
+  </g>
+  <g fill="#a0a0a0" font-size="10">
+    <text x="215" y="145">alternate</text>
+    <text x="470" y="305">none</text>
+    <text x="715" y="225">round 100</text>
+    <text x="640" y="272">yes</text>
+    <text x="505" y="300">next round</text>
+    <text x="215" y="385">start</text>
+    <text x="465" y="385">wake</text>
+    <text x="195" y="225" text-anchor="end"></text>
+    <text x="205" y="300">back to the</text><text x="205" y="312">credit wait</text>
+    <text x="470" y="95">attract phase over: restart the loop</text>
+    <text x="640" y="195">the round loop, task 2, is also used for the demos</text>
+  </g>
+</svg>

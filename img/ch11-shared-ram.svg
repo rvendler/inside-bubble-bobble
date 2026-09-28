@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="960" height="600" fill="#181818"/>
+  <text x="20" y="24" fill="#ffffff" font-size="13">The 6 KB the two Z80s share ($E000-$F7FF): the bytes the sub CPU reads and writes, and who owns what</text>
+  <g font-size="11">
+    <text x="20" y="50" fill="#c0c0c0">address</text><text x="150" y="50" fill="#c0c0c0">contents</text><text x="555" y="50" fill="#c0c0c0">main CPU</text><text x="690" y="50" fill="#c0c0c0">sub CPU</text>
+    <line x1="20" y1="56" x2="940" y2="56" stroke="#606060"/>
+  </g>
+  <g font-size="11" fill="#e0e0e0">
+    <rect x="20" y="62" width="920" height="18" fill="#2c2c2c"/><text x="24" y="75">$E000-$E1CC</text><text x="150" y="75">the kernel: task states, stacks, scheduler pointers (chapter 9)</text><text x="555" y="75">owns</text><text x="690" y="75">never touches</text>
+    <rect x="20" y="82" width="920" height="18" fill="#3a5a3a"/><text x="24" y="95">$E338</text><text x="150" y="95">the frame counter</text><text x="555" y="95">writes</text><text x="690" y="95">reads: its watchdog on the main CPU</text>
+    <rect x="20" y="102" width="920" height="18" fill="#5a5a3a"/><text x="24" y="115">$E397</text><text x="150" y="115">collision map request: main writes 1, sub answers $FF</text><text x="555" y="115">writes 1, polls</text><text x="690" y="115">writes $FF</text>
+    <rect x="20" y="122" width="920" height="18" fill="#5a3a5a"/><text x="24" y="135">$E3E8-$E567</text><text x="150" y="135">the collision map, rows 5-28 (chapter 6)</text><text x="555" y="135">reads every frame</text><text x="690" y="135">writes at round start</text>
+    <rect x="20" y="142" width="920" height="18" fill="#3a5a3a"/><text x="24" y="155">$E5D7, $E5F4, $E64B</text><text x="150" y="155">players alive; enemies taken by special bubbles; the round number</text><text x="555" y="155">writes / reads</text><text x="690" y="155">reads; increments $E5F4</text>
+    <rect x="20" y="162" width="920" height="18" fill="#5a5a3a"/><text x="24" y="175">$E691-$E6F4</text><text x="150" y="175">the two player records (chapter 13): state, x, y, facing, speeds, jump</text><text x="555" y="175">owns, moves</text><text x="690" y="175">reads; writes caught / burnt / hit / bounce</text>
+    <rect x="20" y="182" width="920" height="18" fill="#3a5a3a"/><text x="24" y="195">$E723, $E730, $E737</text><text x="150" y="195">secret-room flag; exit touched; round over (collisions off)</text><text x="555" y="195">writes</text><text x="690" y="195">reads; sets $E730</text>
+    <rect x="20" y="202" width="920" height="18" fill="#5a5a3a"/><text x="24" y="215">$E76B, $E76C-$EB2B</text><text x="150" y="215">bubble count and 24 bubble records of 40 bytes (chapter 16)</text><text x="555" y="215">owns, moves, pops</text><text x="690" y="215">reads; writes nine fields per record</text>
+    <rect x="20" y="222" width="920" height="18" fill="#5a3a3a"/><text x="24" y="235">$EB99-$EC28</text><text x="150" y="235">8 rocks of 18 bytes (the rock throwers, chapter 17)</text><text x="555" y="235">owns</text><text x="690" y="235">reads: burn a player within 8 px</text>
+    <rect x="20" y="242" width="920" height="18" fill="#5a3a3a"/><text x="24" y="255">$EC29-$ED20</text><text x="150" y="255">8 missiles of 16 bytes; 7 fire shots of 17 bytes</text><text x="555" y="255">owns</text><text x="690" y="255">reads: catch or burn a player at 8 px</text>
+    <rect x="20" y="262" width="920" height="18" fill="#5a5a3a"/><text x="24" y="275">$ED21-$ED3D</text><text x="150" y="275">7 enemy records of 4 bytes [flags, x, y, touch]; the enemy count</text><text x="555" y="275">writes flags, x, y</text><text x="690" y="275">writes touch; caught = $10; count--</text>
+    <rect x="20" y="282" width="920" height="18" fill="#3a5a3a"/><text x="24" y="295">$F1C2, $F1D4</text><text x="150" y="295">the two Skel-Monsta records (the exits of a secret room)</text><text x="555" y="295">owns</text><text x="690" y="295">reads: catch / exit within 10 px</text>
+    <rect x="20" y="302" width="920" height="18" fill="#3a5a3a"/><text x="24" y="315">$F296</text><text x="150" y="315">the boss record (chapter 19)</text><text x="555" y="315">owns</text><text x="690" y="315">reads: catch a player within 36 px</text>
+    <rect x="20" y="322" width="920" height="18" fill="#5a3a3a"/><text x="24" y="335">$F367-$F444</text><text x="150" y="335">8 x 12-byte and 7 x 17-byte objects: boss and message-panel projectiles</text><text x="555" y="335">owns</text><text x="690" y="335">reads: catch a player within 8 px</text>
+    <rect x="20" y="342" width="920" height="18" fill="#5a3a3a"/><text x="24" y="355">$F47C-$F50D</text><text x="150" y="355">8 flying objects of 9 bytes; 8 falling items of 8 bytes (chapter 18)</text><text x="555" y="355">owns</text><text x="690" y="355">reads: catch enemy 15 px, pop bubble 16</text>
+    <rect x="20" y="362" width="920" height="18" fill="#5a3a3a"/><text x="24" y="375">$F595-$F5B6</text><text x="150" y="375">the flyer and the bouncing object; $F59E, $F5B6 pause the bubble pass</text><text x="555" y="375">owns</text><text x="690" y="375">reads</text>
+    <rect x="20" y="382" width="920" height="18" fill="#3a5a3a"/><text x="24" y="395">$F66B</text><text x="150" y="395">round running: $49 while the round is being played</text><text x="555" y="395">writes</text><text x="690" y="395">reads: gates the whole pass</text>
+    <rect x="20" y="402" width="920" height="18" fill="#5a3a5a"/><text x="24" y="415">$F66C-$F66E</text><text x="150" y="415">watchdog copy of $E338 and its stall count; the sub CPU's heartbeat</text><text x="555" y="415">reads $F66E</text><text x="690" y="415">writes</text>
+    <rect x="20" y="422" width="920" height="18" fill="#5a5a3a"/><text x="24" y="435">$F66F-$F67A</text><text x="150" y="435">pop event: flag, group, x, y, chain count, push mode, player, bonus, tallies</text><text x="555" y="435">reads; scores</text><text x="690" y="435">writes</text>
+    <rect x="20" y="442" width="920" height="18" fill="#2c2c2c"/><text x="24" y="455">$F7CE downwards</text><text x="150" y="455">the sub CPU's stack</text><text x="555" y="455">-</text><text x="690" y="455">owns</text>
+    <rect x="20" y="462" width="920" height="18" fill="#2c2c2c"/><text x="24" y="475">$F7FE downwards</text><text x="150" y="475">the main CPU's interrupt stack (chapter 9)</text><text x="555" y="475">owns</text><text x="690" y="475">-</text>
+  </g>
+  <g font-size="11" fill="#c0c0c0">
+    <text x="20" y="510">Everything else in $E000-$F7FF is the main CPU's private work RAM, which the sub CPU could read but never does.</text>
+    <text x="20" y="528">green: control bytes and flags; yellow: records both CPUs write; red: records the sub CPU only reads; purple: data one side produces for the other.</text>
+    <text x="20" y="546">There is no lock and no handshake apart from $E397: the sub CPU's pass overlaps the main CPU's tasks, and the exact interleaving of</text>
+    <text x="20" y="562">the two decides which frame's positions a test sees. The emulator interleaves the CPUs four times per scan line to reproduce it.</text>
+  </g>
+</svg>

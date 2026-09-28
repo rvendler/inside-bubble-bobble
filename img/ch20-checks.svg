@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="470" fill="#181818"/>
+  <text x="20" y="24" fill="#ffffff" font-size="13">Where the protection hides: the 96 KB of the main program, the ranges the 23 checksum walkers cover, and the routines that carry the other checks</text>
+  <!-- ruler: 96 KB = fixed 32 KB + banks 0-3 (16 KB each), 8 px per KB -> 768 px from x=60 -->
+  <g font-size="10" fill="#c0c0c0">
+    <rect x="60" y="50" width="256" height="14" fill="#303050" stroke="#606080"/><text x="64" y="61">fixed $0000-$7FFF</text>
+    <rect x="316" y="50" width="128" height="14" fill="#305030" stroke="#608060"/><text x="320" y="61">bank 0 (enemies)</text>
+    <rect x="444" y="50" width="128" height="14" fill="#503030" stroke="#806060"/><text x="448" y="61">bank 1 (data)</text>
+    <rect x="572" y="50" width="128" height="14" fill="#505030" stroke="#808060"/><text x="576" y="61">bank 2 (objects)</text>
+    <rect x="700" y="50" width="128" height="14" fill="#503050" stroke="#806080"/><text x="704" y="61">bank 3</text>
+  </g>
+  <!-- walker ranges: fixed ROM: x = 60 + addr/128 ; bank n: x = 316 + 128*n + (addr-0x8000)/128 -->
+  <g stroke-width="3" fill="none">
+    <!-- fixed-ROM walkers -->
+    <line x1="60" y1="80" x2="84" y2="80" stroke="#ffb040"/>       <!-- 0004-0C08 -->
+    <line x1="60" y1="86" x2="158" y2="86" stroke="#ffb040"/>      <!-- 0030-314E -->
+    <line x1="60" y1="92" x2="299" y2="92" stroke="#ffb040"/>      <!-- 0000-7781 -->
+    <line x1="60" y1="98" x2="72" y2="98" stroke="#ffb040"/>       <!-- 0020-0600 -->
+    <line x1="65" y1="104" x2="207" y2="104" stroke="#ffb040"/>    <!-- 028E-757B -->
+    <line x1="101" y1="110" x2="313" y2="110" stroke="#ffb040"/>   <!-- 147E-7ACD -->
+    <line x1="60" y1="116" x2="90" y2="116" stroke="#ffb040"/>     <!-- 0001-0EDD -->
+    <line x1="136" y1="122" x2="264" y2="122" stroke="#ffb040"/>   <!-- 2642-731C -->
+    <line x1="60" y1="128" x2="100" y2="128" stroke="#ffb040"/>    <!-- 0038-142C -->
+    <!-- bank 0 -->
+    <line x1="316" y1="80" x2="444" y2="80" stroke="#80ff80"/>     <!-- 8000-C000 (9240) -->
+    <line x1="382" y1="86" x2="444" y2="86" stroke="#80ff80"/>     <!-- A103-BFFF (b8fc) -->
+    <!-- bank 2 -->
+    <line x1="614" y1="80" x2="683" y2="80" stroke="#ffff80"/>     <!-- 9532-B788 -->
+    <line x1="572" y1="86" x2="580" y2="86" stroke="#ffff80"/>     <!-- 8000-8401 -->
+    <line x1="582" y1="92" x2="653" y2="92" stroke="#ffff80"/>     <!-- 8514-A8A8 -->
+    <line x1="610" y1="98" x2="700" y2="98" stroke="#ffff80"/>     <!-- 9341-C000 -->
+    <line x1="648" y1="104" x2="672" y2="104" stroke="#ffff80"/>   <!-- A670-B150 -->
+    <line x1="572" y1="110" x2="579" y2="110" stroke="#ffff80"/>   <!-- 8015-8351 -->
+    <line x1="572" y1="116" x2="604" y2="116" stroke="#ffff80"/>   <!-- 8000-8FCB -->
+    <line x1="636" y1="122" x2="689" y2="122" stroke="#ffff80"/>   <!-- 9FC0-BABB -->
+    <line x1="572" y1="128" x2="587" y2="128" stroke="#ffff80"/>   <!-- 8016-8766 -->
+    <line x1="683" y1="134" x2="700" y2="134" stroke="#ffff80"/>   <!-- B710-BFFF -->
+  </g>
+  <text x="60" y="150" fill="#c0c0c0" font-size="10">each line: the ROM range one walker sums, a few bytes per call, from routines it has nothing to do with</text>
+  <text x="60" y="163" fill="#c0c0c0" font-size="10">(enemy round-init, the invincibility tick, the jump start, the bubble spawn, the floor fires ...)</text>
+  <g font-size="11" fill="#e0e0e0">
+    <text x="60" y="180" fill="#ffffff">The other checks, by count of sites in the program:</text>
+    <text x="60" y="200">24 x  the word at $0B2E (the interrupt vector) must be $044D</text>
+    <text x="60" y="216">13 x  the word at $0004 (the RST 0 jump) must be $00B9</text>
+    <text x="60" y="232">14 x  the MCU handshake byte $FC85 must still read $37 (or have certain bits)</text>
+    <text x="60" y="248">8 x   the I register and $FC00 together must form $0B2E</text>
+    <text x="60" y="264">7 x   the first three ROM bytes (DI, IM 2) must sum to $3E</text>
+    <text x="60" y="280">6 x   the byte at $0002 must be $5E</text>
+    <text x="60" y="296">2 x   the MCU's countdown bytes and the sub CPU's records are compared in passing</text>
+    <text x="60" y="326" fill="#ffffff">What a failed check does:</text>
+    <text x="60" y="346">an extra POP or PUSH (the return goes to the wrong place, later)  ·  EX (SP),HL  ·  RST $38  ·  LD I,R (the interrupt vector is scrambled)</text>
+    <text x="60" y="362">a walker's bomb: the high-score table replaced from ROM, a byte of RAM changed, the stack shifted, an enemy flag cleared</text>
+    <text x="60" y="392" fill="#a0a0a0">None of the failures is immediate. The game runs on, and dies at a distance from the check — a monster stops chasing, a jump lands wrong, a round hangs —</text>
+    <text x="60" y="408" fill="#a0a0a0">which is the point: a copier patching one check at a time has no way to tell which one is killing the game.</text>
+  </g>
+</svg>

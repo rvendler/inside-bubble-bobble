@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="340" viewBox="0 0 900 340" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="340" fill="#181818"/>
+  <!-- scale: 0..16896 us across x = 90..870 (0.04616 px per us) -->
+  <text x="90" y="18" fill="#ffffff" font-size="13">One frame of round 1 (one player, frame 1500 of the traced game): microseconds after the start of VBLANK</text>
+  <g fill="#c0c0c0" font-size="11" text-anchor="middle">
+    <line x1="90" y1="300" x2="870" y2="300" stroke="#808080"/>
+    <line x1="90" y1="300" x2="90" y2="306" stroke="#c0c0c0"/><text x="90" y="320">0</text>
+    <line x1="182" y1="300" x2="182" y2="306" stroke="#c0c0c0"/><text x="182" y="320">2000</text>
+    <line x1="275" y1="300" x2="275" y2="306" stroke="#c0c0c0"/><text x="275" y="320">4000</text>
+    <line x1="367" y1="300" x2="367" y2="306" stroke="#c0c0c0"/><text x="367" y="320">6000</text>
+    <line x1="459" y1="300" x2="459" y2="306" stroke="#c0c0c0"/><text x="459" y="320">8000</text>
+    <line x1="552" y1="300" x2="552" y2="306" stroke="#c0c0c0"/><text x="552" y="320">10000</text>
+    <line x1="644" y1="300" x2="644" y2="306" stroke="#c0c0c0"/><text x="644" y="320">12000</text>
+    <line x1="736" y1="300" x2="736" y2="306" stroke="#c0c0c0"/><text x="736" y="320">14000</text>
+    <line x1="829" y1="300" x2="829" y2="306" stroke="#c0c0c0"/><text x="829" y="320">16000</text>
+    <line x1="870" y1="300" x2="870" y2="306" stroke="#c0c0c0"/><text x="870" y="334">16896</text>
+  </g>
+  <!-- video row -->
+  <text x="10" y="52" fill="#e0e0e0">video</text>
+  <rect x="90" y="38" width="118" height="20" fill="#404060"/>
+  <text x="96" y="52" fill="#ffffff" font-size="11">VBLANK 2560 us</text>
+  <rect x="208" y="38" width="662" height="20" fill="#2a4a2a"/>
+  <text x="214" y="52" fill="#d0ffd0" font-size="11">display, 224 lines: the video hardware reads the object list and the tile maps</text>
+  <!-- MCU row -->
+  <text x="10" y="86" fill="#e0e0e0">MCU</text>
+  <rect x="90" y="72" width="5" height="20" fill="#c0a040"/>
+  <text x="100" y="86" fill="#ffe0a0" font-size="11">IRQ1 at VBLANK: read the inputs, then pulse the main CPU's interrupt line (about 100 us); geometry for the rest of the frame</text>
+  <!-- main row -->
+  <text x="10" y="126" fill="#e0e0e0">main Z80</text>
+  <rect x="95" y="112" width="59" height="20" fill="#9090c0"/>
+  <rect x="165" y="112" width="25" height="20" fill="#40ff40"/>
+  <rect x="196" y="112" width="66" height="20" fill="#5050ff"/>
+  <rect x="266" y="112" width="97" height="20" fill="#c040c0"/>
+  <rect x="367" y="112" width="199" height="20" fill="#e0c040"/>
+  <rect x="568" y="112" width="302" height="20" fill="#303030"/>
+  <text x="575" y="126" fill="#909090" font-size="11">idle: JR $01ED until the next interrupt (10378-16896)</text>
+  <line x1="162" y1="108" x2="162" y2="136" stroke="#ffffff"/>
+  <line x1="566" y1="108" x2="566" y2="136" stroke="#ffffff"/>
+  <g font-size="11">
+    <rect x="97" y="144" width="10" height="9" fill="#9090c0"/><text x="112" y="153" fill="#c0c0ff">interrupt handler, 115-1395: copy the object list to $DD00, pump the sound queue, step the RNG, essentials</text>
+    <rect x="97" y="158" width="10" height="9" fill="#40ff40"/><text x="112" y="167" fill="#a0ffa0">task 2, 1690-2225: the round loop: inputs, clocks, prompts</text>
+    <rect x="97" y="172" width="10" height="9" fill="#5050ff"/><text x="112" y="181" fill="#a0a0ff">task 3, 2302-3740: both players, the items, the round's sequences</text>
+    <rect x="97" y="186" width="10" height="9" fill="#c040c0"/><text x="112" y="195" fill="#ffa0ff">task 4, 3817-5928: the enemies, and their records for the MCU</text>
+    <rect x="97" y="200" width="10" height="9" fill="#e0c040"/><text x="112" y="209" fill="#ffe0a0">task 5, 6006-10316: bubbles and items</text>
+    <text x="97" y="223" fill="#ffffff">white marks: scheduler pass begins at 1632, frame_done = 1 at 10358</text>
+  </g>
+  <!-- sub row -->
+  <text x="10" y="252" fill="#e0e0e0">sub Z80</text>
+  <rect x="91" y="238" width="184" height="20" fill="#c05050"/>
+  <text x="96" y="252" fill="#ffffff" font-size="11">collision pass, about 4000 us</text>
+  <rect x="275" y="238" width="595" height="20" fill="#303030"/>
+  <text x="282" y="252" fill="#909090" font-size="11">idle: JR $000A</text>
+  <text x="10" y="282" fill="#e0e0e0">sound Z80</text>
+  <text x="90" y="282" fill="#909090" font-size="11">not paced by the frame: the two chip timers interrupt it every few milliseconds regardless of the picture</text>
+</svg>

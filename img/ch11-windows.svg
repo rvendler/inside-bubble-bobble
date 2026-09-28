@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="470" fill="#181818"/>
+  <text x="20" y="24" fill="#ffffff" font-size="13">The sub CPU's proximity tests: every test is a window of |dx| and |dy| around a record's (x, y), in pixels. Scale 2 px per pixel.</text>
+  <!-- panel 1: enemy vs player -->
+  <g transform="translate(40,60)">
+    <text x="0" y="0" fill="#e0e0e0" font-size="12">enemy against a player (both from record position)</text>
+    <!-- 16 px touch window: 32x32 around centre at (100,100) -->
+    <rect x="68" y="68" width="64" height="64" fill="none" stroke="#e0a040" stroke-dasharray="4,3"/>
+    <rect x="80" y="80" width="40" height="40" fill="none" stroke="#ff5050"/>
+    <rect x="96" y="96" width="8" height="8" fill="#ff5050"/>
+    <text x="136" y="86" fill="#ffb0b0" font-size="11">within 10: the player is caught</text>
+    <text x="136" y="100" fill="#ffb0b0" font-size="11">(or, if invulnerable, the enemy is)</text>
+    <text x="136" y="126" fill="#ffe0a0" font-size="11">within 16: touch byte = which player</text>
+    <text x="0" y="170" fill="#a0a0a0" font-size="10">8 px: fire shots, rocks, missiles and the</text>
+    <text x="0" y="184" fill="#a0a0a0" font-size="10">message panels' objects against a player</text>
+  </g>
+  <!-- panel 2: player vs bubble -->
+  <g transform="translate(330,60)">
+    <text x="0" y="0" fill="#e0e0e0" font-size="12">a player against a bubble (bubble at the centre)</text>
+    <rect x="96" y="96" width="8" height="8" fill="#60c0ff"/>
+    <!-- vertical band |dx| < 12 : 24 px tall = 48 px -->
+    <rect x="30" y="76" width="140" height="48" fill="none" stroke="#606060" stroke-dasharray="2,2"/>
+    <!-- pop window on the facing side: 18 px = 36 px wide -->
+    <rect x="64" y="76" width="36" height="48" fill="#40ff40" fill-opacity="0.25" stroke="#40ff40"/>
+    <!-- push window in front (player faces right): 10 px = 20 px -->
+    <rect x="100" y="76" width="20" height="48" fill="#ff80ff" fill-opacity="0.25" stroke="#ff80ff"/>
+    <text x="66" y="72" fill="#a0a0a0" font-size="9">behind</text><text x="102" y="72" fill="#a0a0a0" font-size="9">in front</text>
+    <text x="0" y="150" fill="#a0ffa0" font-size="11">walking: a bubble behind the player within 18 px</text>
+    <text x="0" y="164" fill="#a0ffa0" font-size="11">(and 12 px vertically) bursts on the fins</text>
+    <text x="0" y="182" fill="#ffb0ff" font-size="11">in front, within 10 px: the bubble is pushed along</text>
+    <text x="0" y="196" fill="#ffb0ff" font-size="11">at the player's walking speed</text>
+    <!-- falling case -->
+    <rect x="96" y="60" width="8" height="8" fill="#60c0ff" transform="translate(230,0)"/>
+    <rect x="308" y="46" width="48" height="24" fill="#40ff40" fill-opacity="0.25" stroke="#40ff40"/>
+    <rect x="308" y="26" width="48" height="20" fill="#ffe040" fill-opacity="0.25" stroke="#ffe040"/>
+    <text x="230" y="96" fill="#a0ffa0" font-size="11">falling: less than 12 px above pops</text>
+    <text x="230" y="110" fill="#ffe0a0" font-size="11">12 to 21 px above: the player lands on it</text>
+    <text x="230" y="124" fill="#ffe0a0" font-size="11">and bounces ("you can jump over bubbles")</text>
+  </g>
+  <!-- panel 3: bubble vs bubble -->
+  <g transform="translate(40,290)">
+    <text x="0" y="0" fill="#e0e0e0" font-size="12">bubble against bubble</text>
+    <rect x="96" y="96" width="8" height="8" fill="#60c0ff"/>
+    <rect x="74" y="48" width="52" height="52" fill="#60c0ff" fill-opacity="0.2" stroke="#60c0ff"/>
+    <text x="136" y="60" fill="#c0e0ff" font-size="11">a bubble with a push mode shoves each neighbour</text>
+    <text x="136" y="74" fill="#c0e0ff" font-size="11">within 13 px on the side it pushes towards by 1 px</text>
+    <text x="136" y="88" fill="#c0e0ff" font-size="11">per frame (2 px if the neighbour is itself pushed)</text>
+    <text x="136" y="112" fill="#c0e0ff" font-size="11">chain pop: after a pop, every bubble of another</text>
+    <text x="136" y="126" fill="#c0e0ff" font-size="11">group within 20 px pops next frame, and so on</text>
+  </g>
+  <!-- panel 4: others -->
+  <g transform="translate(500,290)">
+    <text x="0" y="0" fill="#e0e0e0" font-size="12">other windows</text>
+    <text x="0" y="24" fill="#c0c0c0" font-size="11">special bubble (water, fire, lightning): a player within 10 px is hit for 60 frames,</text>
+    <text x="0" y="38" fill="#c0c0c0" font-size="11">otherwise an enemy within 15 px is caught</text>
+    <text x="0" y="60" fill="#c0c0c0" font-size="11">flying objects, falling items, the bouncing object: an enemy within 15 px is caught;</text>
+    <text x="0" y="74" fill="#c0c0c0" font-size="11">the flyer catches within 24 px; any of them pops a bubble within 16 px</text>
+    <text x="0" y="96" fill="#c0c0c0" font-size="11">Skel-Monsta, or a secret room's exit: a player within 10 px</text>
+    <text x="0" y="118" fill="#c0c0c0" font-size="11">the boss: a player within 36 px is caught</text>
+    <text x="0" y="150" fill="#808080" font-size="10">All windows are squares in |dx|, |dy|; no test uses a sprite's real outline.</text>
+  </g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="330" font-family="Menlo,Consolas,monospace" font-size="12">
+<rect width="860" height="330" fill="#fbfaf7"/>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#444"/></marker></defs>
+<g stroke="#333" fill="#ffe9c9"><rect x="20" y="30" width="180" height="50" rx="4"/></g>
+<text x="30" y="50">command $07</text><text x="30" y="68">table $329C+$0E -> $3705</text>
+<g stroke="#333" fill="#dfeeff"><rect x="240" y="20" width="200" height="70" rx="4"/></g>
+<text x="250" y="40">$3705: 09  a list of 9</text><text x="250" y="58">$3718 $371F $3726 $372D</text><text x="250" y="76">$3734 ... $3750</text>
+<g stroke="#333" fill="#e6f5df"><rect x="480" y="20" width="360" height="90" rx="4"/></g>
+<text x="490" y="40">header $3718: 9A 81 01 30</text><text x="490" y="58">kind $9A = YM3526 ch.0, 2nd voice ($8490)</text><text x="490" y="76">priority 8, loops 1, 1 step, follow-up $30</text><text x="490" y="94">step 0: 81 68 7A = priority 8, repeat 1, pattern $7A68</text>
+<g stroke="#333" fill="#f4dfef"><rect x="20" y="140" width="820" height="170" rx="4"/></g>
+<text x="30" y="160" font-weight="bold" font-family="Helvetica,Arial,sans-serif">pattern $7A68 (byte code, read one note at a time by the channel's interpreter)</text>
+<text x="30" y="184">24        rest 36 ticks</text><text x="30" y="202">CC B0 D4  tempo: timer A period $D4</text><text x="30" y="220">CF 05     instrument 5</text><text x="30" y="238">D3        note D#5</text><text x="30" y="256">DC 18 00 00  vibrato</text><text x="30" y="274">DD 04 0E  envelope</text><text x="30" y="292">18        key on, 24 ticks</text>
+<text x="330" y="184">D3 0C     D#5, 12 ticks</text><text x="330" y="202">D2 18     D5, 24</text><text x="330" y="220">D0 0C     C5, 12</text><text x="330" y="238">D2 18     D5, 24</text><text x="330" y="256">D3 0C     D#5, 12</text><text x="330" y="274">D5 30     F5, 48</text><text x="330" y="292">CA 24     A#4, 36 ...</text>
+<text x="600" y="184">a byte &lt; $80 is a duration:</text><text x="600" y="202">key the current note on</text><text x="600" y="220">and wait that many ticks</text><text x="600" y="246">$8n-$Fn, n &lt; 12: a note</text><text x="600" y="264">$8n-$Fn, n &gt;= 12: a command</text><text x="600" y="282">(n-12) + 4 x octave bits</text><text x="600" y="300">00 first: end of pattern</text>
+<g stroke="#444" stroke-width="1.5" fill="none" marker-end="url(#a)"><path d="M200,55 L240,55"/><path d="M440,55 L480,55"/><path d="M660,110 L660,140"/></g>
+</svg>

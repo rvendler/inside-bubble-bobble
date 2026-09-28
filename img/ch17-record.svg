@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="520" fill="#181818"/>
+  <text x="20" y="24" fill="#ffffff" font-size="13">A type-0 enemy record: 25 bytes at $ED49 + 25n (the other drivers use the same layout with a few extra bytes)</text>
+  <g font-size="11" fill="#e0e0e0">
+    <text x="20" y="50" fill="#c0c0c0">offset</text><text x="100" y="50" fill="#c0c0c0">field</text><text x="330" y="50" fill="#c0c0c0">meaning</text>
+    <line x1="20" y1="56" x2="880" y2="56" stroke="#606060"/>
+    <rect x="20" y="62" width="860" height="17" fill="#3a3a5a"/><text x="24" y="74">+$00</text><text x="100" y="74">flags</text><text x="330" y="74">bit 0 on the field, 1 dying, 2 in a bubble, 3 gone, 4 killed by a bubble pop, 5 entrance done, 6 released, 7 angry</text>
+    <rect x="20" y="80" width="860" height="17" fill="#3a5a3a"/><text x="24" y="92">+$01, +$02</text><text x="100" y="92">x, y</text><text x="330" y="92">position, from the object slot; also copied to the shared records at $ED21 for the MCU and the sub CPU</text>
+    <rect x="20" y="98" width="860" height="17" fill="#2c2c2c"/><text x="24" y="110">+$03, +$04</text><text x="100" y="110">object slot pointer</text><text x="330" y="110">handed out by the slot allocator at round start</text>
+    <rect x="20" y="116" width="860" height="17" fill="#2c2c2c"/><text x="24" y="128">+$05, +$06</text><text x="100" y="128">animation frame, tick</text><text x="330" y="128">the walk cycle, or the tumble while dying</text>
+    <rect x="20" y="134" width="860" height="17" fill="#3a3a5a"/><text x="24" y="146">+$07</text><text x="100" y="146">state</text><text x="330" y="146">0 idle, 1 walking right, 2 falling, 3 walking left, 4 jumping (from a right walk), 5 jumping (from a left walk)</text>
+    <rect x="20" y="152" width="860" height="17" fill="#3a5a3a"/><text x="24" y="164">+$08</text><text x="100" y="164">direction</text><text x="330" y="164">1 right, 3 left: which way to face and which walk state to land in</text>
+    <rect x="20" y="170" width="860" height="17" fill="#2c2c2c"/><text x="24" y="182">+$09</text><text x="100" y="182">enemy index</text><text x="330" y="182">0-6: selects the 4-byte shared record at $ED21 and the 8-byte MCU result at $FC27</text>
+    <rect x="20" y="188" width="860" height="17" fill="#2c2c2c"/><text x="24" y="200">+$0A</text><text x="100" y="200">slot code</text><text x="330" y="200">for the sprite routines</text>
+    <rect x="20" y="206" width="860" height="17" fill="#3a5a3a"/><text x="24" y="218">+$0B, +$0C, +$0D</text><text x="100" y="218">speed list index, speed list, step</text><text x="330" y="218">the same lists at $11CE as the players and bubbles: the record's [8] normally, +6 when angry, capped at 40</text>
+    <rect x="20" y="224" width="860" height="17" fill="#5a5a3a"/><text x="24" y="236">+$0E</text><text x="100" y="236">movement flags</text><text x="330" y="236">bit 1 moved this frame, bit 5 fell, bit 6 the angry speed applied, bit 7 the hurry-up speed; while dying: the death state</text>
+    <rect x="20" y="242" width="860" height="17" fill="#5a5a3a"/><text x="24" y="254">+$0F</text><text x="100" y="254">chase flag</text><text x="330" y="254">set when the player is within 32 lines vertically; while dead: which player collected the fruit</text>
+    <rect x="20" y="260" width="860" height="17" fill="#2c2c2c"/><text x="24" y="272">+$10, +$11</text><text x="100" y="272">script pointer</text><text x="330" y="272">the movement script (a jump or a turn); during the entrance: the step timer and the target line</text>
+    <rect x="20" y="278" width="860" height="17" fill="#2c2c2c"/><text x="24" y="290">+$12, +$13</text><text x="100" y="290">script step, repeats</text><text x="330" y="290">during the entrance: the 180-frame timer</text>
+    <rect x="20" y="296" width="860" height="17" fill="#5a5a3a"/><text x="24" y="308">+$14</text><text x="100" y="308">blocked counter</text><text x="330" y="308">frames spent against a wall; at 60 the enemy jumps out of the corner</text>
+    <rect x="20" y="314" width="860" height="17" fill="#5a5a3a"/><text x="24" y="326">+$15</text><text x="100" y="326">decision timer</text><text x="330" y="326">counts down to the next chase-or-jump decision; while dead: the fruit index</text>
+    <rect x="20" y="332" width="860" height="17" fill="#2c2c2c"/><text x="24" y="344">+$16</text><text x="100" y="344">timer</text><text x="330" y="344">120 at start; while dead: the 60-frame pauses of the fruit</text>
+    <rect x="20" y="350" width="860" height="17" fill="#2c2c2c"/><text x="24" y="362">+$17</text><text x="100" y="362">tile set</text><text x="330" y="362">0 normally; 3 marks a variant that never chases; the death tumble reads it as its frame base</text>
+    <rect x="20" y="368" width="860" height="17" fill="#5a5a3a"/><text x="24" y="380">+$18</text><text x="100" y="380">decision bits</text><text x="330" y="380">bit 0 a jump script is running, bit 1 the next decision is a jump (toggles), bit 2 landed, bit 7 the jump script is armed</text>
+  </g>
+  <g font-size="11" fill="#c0c0c0">
+    <text x="20" y="420">The shared record at $ED21 + 4n is [flags, x, y, result]: flags bit 0 = on the field for the sub CPU and the MCU, $80 = caught in a bubble,</text>
+    <text x="20" y="436">$40 = dead and falling, $20 = escaped angry, $10 = caught by an item, 8 = lying as fruit; the result byte carries the sub CPU's touch report,</text>
+    <text x="20" y="452">the chain place that chooses the fruit, or which player picked it up (bit 7 = player 2).</text>
+    <text x="20" y="480">The type-2 record is 35 bytes (a second slot and sprite for the rock in hand); type 3 has 27 (the shot budget); the bouncers keep their scripts in the same bytes.</text>
+  </g>
+</svg>

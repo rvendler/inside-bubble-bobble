@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="420" fill="#181818"/>
+  <text x="20" y="24" fill="#ffffff" font-size="13">Who decides what: the collision work of one frame, split across three processors</text>
+  <!-- three columns -->
+  <g font-size="11" fill="#e0e0e0">
+    <rect x="20" y="44" width="280" height="330" rx="6" fill="#2c2c3c" stroke="#8080c0"/>
+    <text x="30" y="62" fill="#ffffff" font-size="12">main Z80, tasks 3-5 (frame N)</text>
+    <text x="30" y="84">objects against the map (wall_test):</text>
+    <text x="40" y="100">- players walking, falling, jumping (ch. 13, 14)</text>
+    <text x="40" y="114">- bubbles drifting, currents (ch. 16)</text>
+    <text x="40" y="128">- enemies walking, jumping, falling (ch. 17)</text>
+    <text x="40" y="142">- rocks, fire, missiles (ch. 17)</text>
+    <text x="30" y="166">objects against objects, a few:</text>
+    <text x="40" y="182">- item pickups: 14 or 24 px windows (ch. 18)</text>
+    <text x="40" y="196">- the floor fire burning a player (ch. 18)</text>
+    <text x="40" y="210">- enemies escaping bubbles (ch. 16)</text>
+    <text x="30" y="234">writes positions; reads last VBLANK's flags</text>
+    <text x="30" y="258" fill="#a0a0a0">the map is the only geometry the main</text>
+    <text x="30" y="272" fill="#a0a0a0">CPU consults for itself: every other</text>
+    <text x="30" y="286" fill="#a0a0a0">"does it touch?" is a byte another chip</text>
+    <text x="30" y="300" fill="#a0a0a0">wrote during the blanking before</text>
+    <rect x="320" y="44" width="280" height="330" rx="6" fill="#3c2c2c" stroke="#c08080"/>
+    <text x="330" y="62" fill="#ffffff" font-size="12">sub Z80, VBLANK after frame N</text>
+    <text x="330" y="84">objects against objects, all of them:</text>
+    <text x="340" y="100">- enemy catches a player (10 px)</text>
+    <text x="340" y="114">- enemy touches a player (16 px)</text>
+    <text x="340" y="128">- player pops, pushes, rides a bubble</text>
+    <text x="340" y="142">- bubbles crowding bubbles (13 px)</text>
+    <text x="340" y="156">- chain pops (20 px, one per frame)</text>
+    <text x="340" y="170">- special bubbles hit players and enemies</text>
+    <text x="340" y="184">- items and thrown objects catch enemies</text>
+    <text x="340" y="198">- fire shots, rocks, missiles hit players</text>
+    <text x="340" y="212">- the boss (36 px)</text>
+    <text x="330" y="236">reads positions; writes flags into the records</text>
+    <text x="330" y="260" fill="#a0a0a0">square windows in |dx|, |dy| (ch. 11);</text>
+    <text x="330" y="274" fill="#a0a0a0">its verdicts are read by the tasks of</text>
+    <text x="330" y="288" fill="#a0a0a0">frame N + 1, one frame after the</text>
+    <text x="330" y="302" fill="#a0a0a0">positions were written</text>
+    <rect x="620" y="44" width="260" height="330" rx="6" fill="#3c3c2c" stroke="#c0c080"/>
+    <text x="630" y="62" fill="#ffffff" font-size="12">MCU, the same VBLANK</text>
+    <text x="630" y="84">enemies against players, geometry only:</text>
+    <text x="640" y="100">- which way is the player (per axis)</text>
+    <text x="640" y="114">- how far (per axis)</text>
+    <text x="640" y="128">- a touch report nobody reads</text>
+    <text x="630" y="152">reads the 7 records task 4 keeps and the</text>
+    <text x="630" y="166">player positions task 3 wrote; writes</text>
+    <text x="630" y="180">the results the enemy AI reads in</text>
+    <text x="630" y="194">frame N + 1 (ch. 10, 17)</text>
+    <text x="630" y="218" fill="#a0a0a0">not collision but pursuit: the answer</text>
+    <text x="630" y="232" fill="#a0a0a0">to "where do I go?", never to "did I</text>
+    <text x="630" y="246" fill="#a0a0a0">touch?"; the AI cannot chase or jump</text>
+    <text x="630" y="260" fill="#a0a0a0">at a player without it</text>
+  </g>
+  <text x="20" y="400" fill="#909090" font-size="10">Timing: positions written during frame N's tasks (1.6-10 ms after VBLANK) are read by the sub CPU and the MCU at the next VBLANK; their results are acted on in frame N + 1.</text>
+</svg>

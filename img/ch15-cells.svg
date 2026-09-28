@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="470" fill="#181818"/>
+  <text x="20" y="24" fill="#ffffff" font-size="13">The cells the player tests. Grid: 8-pixel map cells; the sprite is 16 x 16 and its record position (x, y) is its centre (the white dot).</text>
+  <!-- each panel: a 7x6 cell grid at 20 px per cell (2.5 px per pixel); sprite = 2x2 cells -->
+  <g id="grid" stroke="#404040" fill="none">
+    <!-- panel 1 -->
+    <g transform="translate(40,60)">
+      <rect x="0" y="0" width="140" height="120"/>
+      <path d="M20,0 V120 M40,0 V120 M60,0 V120 M80,0 V120 M100,0 V120 M120,0 V120 M0,20 H140 M0,40 H140 M0,60 H140 M0,80 H140 M0,100 H140"/>
+    </g>
+    <g transform="translate(260,60)">
+      <rect x="0" y="0" width="140" height="120"/>
+      <path d="M20,0 V120 M40,0 V120 M60,0 V120 M80,0 V120 M100,0 V120 M120,0 V120 M0,20 H140 M0,40 H140 M0,60 H140 M0,80 H140 M0,100 H140"/>
+    </g>
+    <g transform="translate(480,60)">
+      <rect x="0" y="0" width="140" height="120"/>
+      <path d="M20,0 V120 M40,0 V120 M60,0 V120 M80,0 V120 M100,0 V120 M120,0 V120 M0,20 H140 M0,40 H140 M0,60 H140 M0,80 H140 M0,100 H140"/>
+    </g>
+    <g transform="translate(700,60)">
+      <rect x="0" y="0" width="140" height="120"/>
+      <path d="M20,0 V120 M40,0 V120 M60,0 V120 M80,0 V120 M100,0 V120 M120,0 V120 M0,20 H140 M0,40 H140 M0,60 H140 M0,80 H140 M0,100 H140"/>
+    </g>
+  </g>
+  <!-- sprite in each panel: cells (2,2)-(3,3) i.e. x 40..80, y 40..80; position marker at (60,80) -->
+  <g fill="#40c040" fill-opacity="0.35" stroke="#40ff40">
+    <rect x="80" y="100" width="40" height="40"/><rect x="300" y="100" width="40" height="40"/><rect x="520" y="100" width="40" height="40"/><rect x="740" y="100" width="40" height="40"/>
+  </g>
+  <g fill="#ffffff"><circle cx="100" cy="120" r="2.5"/><circle cx="320" cy="120" r="2.5"/><circle cx="540" cy="120" r="2.5"/><circle cx="760" cy="120" r="2.5"/></g>
+  <!-- panel 1: walking right: cell ahead (x, y+8) at the sprite's row (the lower cell row of the sprite? x is the bottom edge: the cell containing x, i.e. row of y 120..140); floor: (x-8; y-7, y, y+7) -->
+  <g fill="#ff8040" fill-opacity="0.45"><rect x="120" y="120" width="20" height="20"/></g>
+  <g fill="#60a0ff" fill-opacity="0.45"><rect x="80" y="140" width="20" height="20"/><rect x="100" y="140" width="20" height="20"/><rect x="60" y="140" width="20" height="20"/></g>
+  <text x="40" y="200" fill="#ffb080" font-size="11">walking right: the cell 8 px ahead in the row</text>
+  <text x="40" y="214" fill="#ffb080" font-size="11">of the sprite's lower half must be air (orange)</text>
+  <text x="40" y="232" fill="#a0c0ff" font-size="11">and one of the three cells 8 px below, at</text>
+  <text x="40" y="246" fill="#a0c0ff" font-size="11">y - 7, y, y + 7, must be solid (blue), or</text>
+  <text x="40" y="260" fill="#a0c0ff" font-size="11">the player starts to fall</text>
+  <!-- panel 2: falling: own row (x; y-7,y,y+7) must be clear, floor row solid, x aligned to 8 -->
+  <g fill="#ffe040" fill-opacity="0.45"><rect x="300" y="120" width="20" height="20"/><rect x="320" y="120" width="20" height="20"/><rect x="280" y="120" width="20" height="20"/></g>
+  <g fill="#60a0ff" fill-opacity="0.45"><rect x="300" y="140" width="20" height="20"/><rect x="320" y="140" width="20" height="20"/><rect x="280" y="140" width="20" height="20"/></g>
+  <text x="260" y="200" fill="#ffe0a0" font-size="11">falling (and the end of a jump): only</text>
+  <text x="260" y="214" fill="#ffe0a0" font-size="11">when x is a multiple of 8, the three cells</text>
+  <text x="260" y="228" fill="#ffe0a0" font-size="11">of the sprite's lower half must be air (yellow)</text>
+  <text x="260" y="246" fill="#a0c0ff" font-size="11">and one of the three below solid: land.</text>
+  <text x="260" y="260" fill="#a0c0ff" font-size="11">Inside a platform: keep falling through it</text>
+  <!-- panel 3: jump side test (moving right): y+9 at x-8, x, x+8 -->
+  <g fill="#ff80ff" fill-opacity="0.45"><rect x="620" y="100" width="20" height="20"/><rect x="620" y="120" width="20" height="20"/><rect x="620" y="140" width="20" height="20"/></g>
+  <text x="480" y="200" fill="#ffb0ff" font-size="11">jumping sideways: the three cells 9 px</text>
+  <text x="480" y="214" fill="#ffb0ff" font-size="11">to the moving side at x + 8, x, x - 8; a</text>
+  <text x="480" y="228" fill="#ffb0ff" font-size="11">solid one blocks the sideways drift (bit 6)</text>
+  <text x="480" y="242" fill="#ffb0ff" font-size="11">but not the rise: platforms are one-way</text>
+  <!-- panel 4: airborne walk_step right: (x-8, y+8) and wall_test_below (y+8; x+8, x) -->
+  <g fill="#40e0e0" fill-opacity="0.45"><rect x="780" y="140" width="20" height="20"/><rect x="780" y="120" width="20" height="20"/><rect x="780" y="100" width="20" height="20"/></g>
+  <text x="700" y="200" fill="#a0f0f0" font-size="11">air control (walk_step, 1 px every</text>
+  <text x="700" y="214" fill="#a0f0f0" font-size="11">third frame): the cells 8 px to the side</text>
+  <text x="700" y="228" fill="#a0f0f0" font-size="11">at x - 8, x and x + 8 must all be air</text>
+  <g fill="#c0c0c0" font-size="11">
+    <text x="40" y="300">Every test is wall_test ($174C): one nibble of the collision map for one pixel position. The cell size is 8 pixels, the sprite 16, so a</text>
+    <text x="40" y="316">column of three cells at y - 7, y, y + 7 covers the sprite's width with a pixel to spare on each side, and a row of three at x - 8, x, x + 8 its</text>
+    <text x="40" y="332">height. The walking test looks one cell ahead only at the lower half: the head passes under a platform edge that the feet would stop at.</text>
+    <text x="40" y="360">Vertical limits: above the map (x from $E0) the air control clamps y to $18-$E7; the faller lands only for x between $20 and $DF, and below $20 the x byte</text>
+    <text x="40" y="376">wraps from 0 to 255: the player leaves the bottom of the plane and reappears at the top, and $E5E7 counts it.</text>
+  </g>
+  <text x="40" y="420" fill="#909090" font-size="10">Positions in the program's convention: x up the screen, y across. In screen terms "x - 8" is the row below the sprite and "y + 8" the column to its right.</text>
+</svg>

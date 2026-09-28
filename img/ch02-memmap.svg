@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="520" font-family="Menlo,Consolas,monospace" font-size="12">
+<rect width="860" height="520" fill="#fbfaf7"/>
+<text x="20" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="bold">Main Z80</text>
+<g stroke="#333">
+<rect x="20" y="36" width="260" height="120" fill="#ffe9c9"/><rect x="20" y="156" width="260" height="60" fill="#ffdca8"/>
+<rect x="20" y="216" width="260" height="60" fill="#d9e8ff"/><rect x="20" y="276" width="260" height="14" fill="#bcd3ff"/>
+<rect x="20" y="290" width="260" height="120" fill="#dff5df"/><rect x="20" y="410" width="260" height="14" fill="#f4dfef"/>
+<rect x="20" y="424" width="260" height="30" fill="#fff0b3"/><rect x="20" y="454" width="260" height="30" fill="#eee"/>
+</g>
+<g><text x="30" y="60">$0000-$7FFF  fixed program ROM (32 KB)</text><text x="30" y="78">  RST vectors, kernel, game flow,</text><text x="30" y="96">  players, bubbles, scoring, text</text><text x="30" y="114">  IM 2 vector table at $0B2E</text>
+<text x="30" y="178">$8000-$BFFF  banked ROM (16 KB window)</text><text x="30" y="196">  bank 0 enemies, 1 data, 2 round objects, 3 tables</text>
+<text x="30" y="238">$C000-$DCFF  video RAM: tile columns</text><text x="30" y="256">  2 bytes per tile (code, attribute)</text><text x="30" y="287">$DD00-$DFFF  object RAM: up to 192 x 4 bytes</text>
+<text x="30" y="312">$E000-$F7FF  work RAM (shared with the sub Z80)</text><text x="30" y="330">  tasks $E000, object records $E1CD,</text><text x="30" y="348">  round $E598, players $E691, bubbles $E76C,</text><text x="30" y="366">  enemies $ED21.., round objects $F44C..</text><text x="30" y="384">  stacks below $F7FE</text>
+<text x="30" y="421">$F800-$F9FF  palette: 256 x RRRRGGGG BBBBxxxx</text>
+<text x="30" y="438">$FA00 sound latch  $FA01 status  $FA03 sound reset</text><text x="30" y="450">$FA80 watchdog  $FB00 sub NMI  $FB40 bank/reset</text>
+<text x="30" y="474">$FC00-$FFFF  MCU shared RAM (1 KB)</text></g>
+<text x="320" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="bold">Bank/reset register $FB40</text>
+<g stroke="#333"><rect x="320" y="36" width="240" height="120" fill="#fff"/></g>
+<g><text x="330" y="56">bit 7  flip screen</text><text x="330" y="74">bit 6  video enable</text><text x="330" y="92">bit 5  MCU running (0 = reset)</text><text x="330" y="110">bit 4  sub Z80 running (0 = reset)</text><text x="330" y="128">bits 2-0  bank number XOR 4</text><text x="330" y="146">(the program writes $74 for bank 0)</text></g>
+<text x="320" y="190" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="bold">Sound Z80</text>
+<g stroke="#333"><rect x="320" y="202" width="240" height="60" fill="#ffe9c9"/><rect x="320" y="262" width="240" height="30" fill="#dff5df"/><rect x="320" y="292" width="240" height="30" fill="#f4dfef"/><rect x="320" y="322" width="240" height="30" fill="#f4dfef"/><rect x="320" y="352" width="240" height="44" fill="#fff0b3"/></g>
+<g><text x="330" y="224">$0000-$7FFF  ROM: sequencer,</text><text x="330" y="242">  instruments, music, effects</text><text x="330" y="282">$8000-$8FFF  RAM (channel records)</text><text x="330" y="312">$9000/$9001  YM2203 address/data</text><text x="330" y="342">$A000/$A001  YM3526 address/data</text><text x="330" y="370">$B000 latch (in/out)  $B001 status,</text><text x="330" y="388">  NMI enable  $B002 NMI disable</text></g>
+<text x="600" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="bold">Sub Z80</text>
+<g stroke="#333"><rect x="600" y="36" width="240" height="60" fill="#ffe9c9"/><rect x="600" y="96" width="240" height="60" fill="#dff5df"/></g>
+<g><text x="610" y="58">$0000-$7FFF  ROM: collision</text><text x="610" y="76">  helper, packed round maps</text><text x="610" y="118">$E000-$F7FF  the main CPU's</text><text x="610" y="136">  work RAM, seen unbanked</text></g>
+<text x="600" y="190" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="bold">MCU 6801U4</text>
+<g stroke="#333"><rect x="600" y="202" width="240" height="60" fill="#ffe9c9"/><rect x="600" y="262" width="240" height="60" fill="#dff5df"/><rect x="600" y="322" width="240" height="74" fill="#fff0b3"/></g>
+<g><text x="610" y="224">$F000-$FFFF  4 KB ROM</text><text x="610" y="242">  (reset vector at $FFFE)</text><text x="610" y="282">$0040-$00FF  internal RAM</text><text x="610" y="300">  (shadows of the shared bytes)</text><text x="610" y="342">Ports: P4 address low, P2 address</text><text x="610" y="360">  high nibble + clock, P1 R/W and</text><text x="610" y="378">  coin/service inputs, P3 data;</text><text x="610" y="393">  addresses 0-3 read the DIP/joysticks</text></g>
+</svg>

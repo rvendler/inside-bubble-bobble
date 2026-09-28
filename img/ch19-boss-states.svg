@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <rect width="900" height="380" fill="#181818"/>
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#c0c0c0"/></marker></defs>
+  <text x="20" y="24" fill="#ffffff" font-size="13">Round 100: the boss record at $F296 and the states of boss_update (0:$A8C6), with the ring and the bolts around it</text>
+  <g stroke="#c0c0c0" stroke-width="1.2" fill="none" marker-end="url(#a)">
+    <path d="M190,110 L250,110"/>
+    <path d="M410,110 L470,110"/>
+    <path d="M550,130 L550,190"/>
+    <path d="M470,210 L410,210" stroke-dasharray="4,3"/>
+    <path d="M630,110 L690,110"/>
+    <path d="M770,130 L770,190"/>
+    <path d="M330,130 L330,190" stroke-dasharray="4,3"/>
+    <path d="M110,130 L110,190"/>
+  </g>
+  <g fill="#e0e0e0" font-size="11" text-anchor="middle">
+    <rect x="30" y="90" width="160" height="40" rx="6" fill="#3a3a5a" stroke="#8080c0"/><text x="110" y="108">appear: 3 x 6 frames of</text><text x="110" y="122">palette flash, then active</text>
+    <rect x="250" y="90" width="160" height="40" rx="6" fill="#3a5a3a" stroke="#80c080"/><text x="330" y="108">active: 120 frames still,</text><text x="330" y="122">sound $15, then it moves</text>
+    <rect x="470" y="90" width="160" height="40" rx="6" fill="#5a5a3a" stroke="#c0c080"/><text x="550" y="108">hit (bit 1): hurt palette,</text><text x="550" y="122">6 x 60 frames, then state 9</text>
+    <rect x="690" y="90" width="160" height="40" rx="6" fill="#5a3a3a" stroke="#c08080"/><text x="770" y="108">fatal (bit 2): sound $27,</text><text x="770" y="122">state $50 or $10: dying</text>
+    <rect x="470" y="190" width="160" height="40" rx="6" fill="#2c2c2c" stroke="#808080"/><text x="550" y="208">flash (bit 7, 6 frames):</text><text x="550" y="222">set by the sub CPU per bolt</text>
+    <rect x="690" y="190" width="160" height="40" rx="6" fill="#5a3a5a" stroke="#c080c0"/><text x="770" y="208">dying: shrink, slots cleared,</text><text x="770" y="222">state $20, enemy count 0</text>
+    <rect x="250" y="190" width="160" height="40" rx="6" fill="#2c2c2c" stroke="#808080"/><text x="330" y="208">the ring: 8 bubbles launched</text><text x="330" y="222">at the player, scripts $BBAE</text>
+    <rect x="30" y="190" width="160" height="40" rx="6" fill="#2c2c2c" stroke="#808080"/><text x="110" y="208">the bolts: lightning bubbles</text><text x="110" y="222">from the two potions ($F611)</text>
+  </g>
+  <g fill="#a0a0a0" font-size="10">
+    <text x="470" y="250">each bolt within 44 px: $F2A1 + 1 (sub CPU); from 70 the boss flashes on its own</text>
+    <text x="30" y="290">Movement: diagonal steps with the edge tests at 0:$AEBB-$AEF6 (turn at y &lt; $2C, y &gt;= $D0, x &gt;= $D8, x &lt; $38); the direction byte +7 picks one of four</text>
+    <text x="30" y="304">step routines from the table at 0:$AAA7. The boss is sixteen object slots ($E275 onwards, a 4 x 4 block of tiles) drawn as sprite columns with attribute $18.</text>
+    <text x="30" y="330">The two "figures" at $EB36 and $EB46 are task 5's: the captives in their bubbles at the top corners, who come down when the enemy count</text>
+    <text x="30" y="344">reaches zero; in the super game with two players the mode-3 finale (0:$AC21) takes over the screen instead.</text>
+  </g>
+</svg>
