@@ -1125,8 +1125,7 @@ even rounds and `$3C` for odd ones — colour group 14 or 15 — so that the out
 screen together in different colours: `load_round_palette` fills the other group with the 32-byte scheme the round
 record's first byte names (eight schemes at `1:$8200`) while the old one is still visible.
 
-![All hundred wall sets, each in its own round's palette scheme: the 2 × 2 patterned block, the plain block, and
-the five tiles in ROM order. The label gives the round and the palette scheme.](img/ch06-wall-sets.png)
+![All hundred wall sets, each in its own round's palette scheme: the 2 × 2 patterned block, the plain block, and the five tiles in ROM order. The label gives the round and the palette scheme.](img/ch06-wall-sets.png)
 
 The sets are graphics, not rules: the fill pass never looks at which round it is beyond the arithmetic above, and
 the designers used the freedom — 100 different patterns from 500 tiles, in eight palettes.
@@ -1141,8 +1140,7 @@ of 8 it calls `round_scroll_step` for the next row. When the line byte wraps to 
 they started, now holding the new round, and `swap_playfield_out` brings the status row home. The rows drawn are
 the ones that have just left the top: each comes back in at the bottom carrying the next round.
 
-![The scroll, every sixteenth frame: round 1 rides up and off, round 2 rides in from below, and the status row
-stays where it is on playfield B.](img/ch06-scroll.png)
+![The scroll, every sixteenth frame: round 1 rides up and off, round 2 rides in from below, and the status row stays where it is on playfield B.](img/ch06-scroll.png)
 
 ![Round 20 as played: the layout is a mirrored pair of figures, with the wall tiles and colour scheme of that round.](img/ch06-round20.png)
 
