@@ -6,6 +6,20 @@ solid under the sprite's feet on the way down. There is no velocity and no gravi
 what feels like an arc is a list of sixty-one numbers read one per step, and what feels like weight is the
 number of steps taken per frame.
 
+> [!NOTE]
+> **How games usually jump**
+> Most platform games model a jump with two numbers. The vertical **velocity** says how far the character moves up
+> or down each frame; **gravity** is a constant subtracted from the velocity each frame. A jump sets the velocity
+> to a large upward value; gravity wears it down to zero at the top of the arc and then makes it more and more
+> negative, so the character falls faster and faster, usually up to a maximum, the **terminal velocity**. The
+> result is a smooth parabola whose shape follows from the numbers: a stronger launch or weaker gravity gives a
+> higher, floatier jump, and many games let the player cut a jump short by releasing the button.
+>
+> Bubble Bobble does none of this. Its arc is written out as a table of movements per step, the same every time,
+> and a fall is a constant one pixel per step. What it gives up is variety; what it gains is a jump whose height
+> and reach are the same everywhere — forty-two pixels up, about thirty-three across — for the round designers to
+> build around.
+
 ## Starting a jump
 
 ```asm

@@ -51,6 +51,18 @@ to answer "does this happen?" — the 37-in-256 test for an EXTEND bubble is one
 register is stepped once per frame and only per frame, two decisions made in the same frame see the same
 value, and a decision made a frame later sees a value that anyone with the ROM can predict.
 
+> [!NOTE]
+> **Shift-register random numbers**
+> A linear-feedback shift register (LFSR) is the classic cheap way to make numbers that look random. The register's
+> bits are shifted one place along, and the bit shifted in at the end is computed from a couple of the others,
+> usually by XOR. With the right choice of bits a 16-bit register runs through tens of thousands of different
+> values before it repeats, in an order that looks patternless, for a few instructions per step.
+>
+> It is not random at all: the next value is completely determined by the current one, so from any value the whole
+> sequence that follows can be predicted. `rng_lfsr` is a variant — the bit fed into bit 0 is the inverted old bit
+> 15, XORed with bit 4 of the shifted value — and the per-frame counts in `rng_pre` and `rng_step` disturb the
+> register between steps, which breaks up the sequence but makes it no less predictable.
+
 The second source is the Z80's refresh register, read with `LD A,R` at twelve places:
 
 | Where | What it decides |
@@ -69,6 +81,18 @@ why the port had to be verified to the cycle: a bubble that lives a second longe
 than in another is not a bug in the bubble code but a slip in the instruction count somewhere before it.
 Bubble Bobble is deterministic in a way that few games are; the randomness is entirely a function of the
 player's inputs and their timing.
+
+> [!NOTE]
+> **The refresh register**
+> The cheap RAM of the 1980s was dynamic RAM, which stores each bit as an electric charge that leaks away within
+> milliseconds unless every row of the chip is read, and so refreshed, regularly. The Z80 was designed to do this
+> for free: after fetching each instruction, while it decodes it, the CPU puts a row address from its `R` register
+> on the address bus for the memory to refresh, and increments `R`.
+>
+> `R` therefore counts instructions: one for each ordinary instruction, two for those with a prefix byte, wrapping
+> around in its low seven bits. A program can read it with `LD A,R`, and because its value depends on how many
+> instructions have run, it looks like a source of chance. It is unpredictable only to someone who cannot count
+> instructions.
 
 What is *not* random is worth listing too, because players assumed it was. The enemies never roll a die:
 every turn, jump and chase is a function of the MCU's geometry bytes and the map. The bonus item is chosen

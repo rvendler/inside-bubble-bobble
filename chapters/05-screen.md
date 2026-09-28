@@ -105,8 +105,8 @@ What is unusual is the program's naming. In every record of the game — players
 byte the code calls `x` (`IX+1`) is the **vertical** position, and it grows **upwards**: it is 256 minus the
 hardware line of the object's centre. The byte called `y` (`IX+2`) is the horizontal position of the centre.
 Bub standing on the floor of round 1 has `x = 32, y = 32`; his object entry holds `256 - 24 = 232` in byte 0 and
-`24` in byte 2, which puts the 16 x 16 sprite at lines 216-231 and pixels 24-39: the centre is at line 224 = 256
-- 32 and pixel 32. Jumping increases `x`; walking right increases `y`. Whether Taito's engine grew out of a
+`24` in byte 2, which puts the 16 x 16 sprite at lines 216-231 and pixels 24-39: the centre is at line 224 =
+256 - 32 and pixel 32. Jumping increases `x`; walking right increases `y`. Whether Taito's engine grew out of a
 vertically mounted game or the names were simply chosen this way is not recorded; the article uses "up", "down",
 "left" and "right" in the player's sense and quotes `x` and `y` only where the code does.
 

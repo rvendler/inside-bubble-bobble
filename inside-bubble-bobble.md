@@ -162,6 +162,18 @@ at `$FC00-$FFFF` is different: the MCU reaches it through a slow parallel interf
 byte), and the main CPU reads it like RAM. There is no locking. The two sides agree on who writes what, and the
 MCU's work runs in a fixed order every frame so that its results are ready when the main program looks.
 
+> [!NOTE]
+> **The watchdog**
+> A watchdog is a timer circuit that runs independently of the program. It counts all the time, and if it ever
+> reaches its limit it resets the board, as if the power had been switched off and on again. The program's side of
+> the bargain is to restart the count — to "kick" the watchdog — often enough that the limit is never reached:
+> Bubble Bobble writes to `$FA80` in every VBLANK and inside every long loop.
+>
+> As long as the program runs normally, nobody notices. If it crashes — a wild jump, a loop that never ends, a
+> corrupted stack — the kicks stop and the watchdog restarts the machine shortly afterwards, instead of leaving a
+> frozen screen in an arcade with nobody there to switch it off. The game also builds two watchdogs of its own in
+> software, each CPU watching a counter that the other increments (chapters 9 and 11).
+
 ## The sub CPU's view
 
 The sub Z80 has its own 32 KB ROM at `$0000-$7FFF` and sees the shared work RAM at `$E000-$F7FF`, the same
@@ -218,6 +230,25 @@ channel and hand it back, and its most frequent effects — the jump, the bubble
 the SSG for a few more. Both chips have programmable timers, and the sound program runs its whole sequencer from
 their interrupts: timer A of the YM2203 paces the YM3526 channels, timer B the YM2203's own.
 
+> [!NOTE]
+> **FM synthesis**
+> The two Yamaha chips make their sound by frequency modulation. The building block is the **operator**: an
+> oscillator producing a sine wave, with an envelope of its own that shapes its loudness over time — how fast it
+> rises when a note starts (attack), how it falls (decay) to the level it holds while the note is held (sustain),
+> and how fast it dies away when the note is let go (release). On its own an operator makes a pure, flute-like
+> tone.
+>
+> FM connects operators so that the output of one wobbles the frequency of another. The modulated wave is no longer
+> a sine: it gains overtones, and how bright, hollow or metallic it sounds depends on the ratio of the two
+> frequencies and on how strongly one modulates the other. Because the modulating operator has its own envelope,
+> the tone can change during a note — a bright attack that mellows, as in a plucked or struck instrument.
+>
+> A channel is a group of operators wired in one of a few fixed patterns, the **algorithm**: two operators per
+> channel on the YM3526 (OPL), four on the YM2203 (OPN), which allows richer sounds. The program starts a note by
+> **keying on** a channel, which starts the envelopes, and ends it by keying off, which sends them into their
+> release. The YM2203's SSG is simpler and older: three square-wave tone generators and a noise generator, the
+> sound of many home computers of the time.
+
 ## Inputs
 
 Two eight-way joysticks with two buttons each (jump and bubble), two start buttons, two coin slots, a service
@@ -273,6 +304,23 @@ which prints `WORK RAM ERROR` and halts with the video on. The same test then ru
 messages are stored as text records right after the code, at `$0234` and `$0244`, together with two more that
 the later checks can print: `PS4 SUM ERROR` and `I/O ERROR`.
 
+> [!NOTE]
+> **The stack**
+> The stack is an area of RAM that the CPU uses as a pile of two-byte values, and the stack pointer register, `SP`,
+> holds the address of the top of the pile. `PUSH` puts a register pair on top (`SP` moves down by two); `POP`
+> takes the top value off again into a register pair (`SP` moves back up). The Z80 uses the same pile for
+> subroutines: `CALL` pushes the address of the instruction after it and jumps, and `RET` pops an address and jumps
+> there. An interrupt pushes the address it interrupted in the same way.
+>
+> Nothing checks that the value `RET` pops is the one `CALL` pushed. Every `PUSH` inside a routine must be matched
+> by a `POP` before its `RET`, or the program "returns" to whatever value happens to be on top. Bubble Bobble uses
+> this twice on purpose: the kernel gives each of its six tasks its own 64-byte stack and switches between tasks by
+> switching `SP` (chapter 9), and the copy protection deliberately leaves an extra value on the stack when a check
+> fails, so that the program goes wrong later and somewhere else (chapter 20).
+>
+> The RAM test above has to run without a stack because the stack lives in the RAM being tested: a `CALL` there
+> would write its return address into memory not yet known to work.
+
 Then the video RAM is cleared (`$C000-$DFFF`, 8 KB, by `mem_clear`), the MCU is given its first command before
 it even runs (`$FF94 = 1`, the coin-lockout command), and the interrupt vector is prepared:
 
@@ -291,6 +339,28 @@ just written with `$2E` — so the vector is `I:$2E = $0B2E`, and the word store
 address of the frame handler. This detail is worth remembering: the value `$0B2E` is checked again and again
 by the copy-protection code in chapter 20, because a bootleg that replaced the MCU with a plain interrupt
 generator would also have had to reproduce this trick.
+
+> [!NOTE]
+> **Interrupts and the Z80's three modes**
+> An interrupt is a signal from outside that makes a processor stop what it is doing, push the address it was at
+> onto the stack, and run a handler; when the handler returns (with `RETI`), the interrupted program carries on as
+> if nothing had happened. A program can refuse interrupts for a while with `DI` and accept them again with `EI`.
+> The Z80 also has a second input, the NMI (non-maskable interrupt), which `DI` cannot block and which always goes
+> to `$0066`; the sound CPU receives its commands that way (chapter 8).
+>
+> For the ordinary interrupt the program chooses, with the `IM` instruction, how the CPU finds its handler:
+>
+> * **Mode 0** (`IM 0`): the interrupting device places an instruction on the data bus and the CPU executes it. It is
+>   a leftover from the Intel 8080, and nothing on this board uses it.
+> * **Mode 1** (`IM 1`): the CPU always calls `$0038`, whoever interrupted it. It is the simplest mode, and the one
+>   the sub Z80 uses (chapter 11).
+> * **Mode 2** (`IM 2`): the CPU forms an address from the `I` register (the high byte) and a byte that the device
+>   puts on the data bus (the low byte), reads the two-byte word stored at that address, and jumps to it. It is meant
+>   to give each device its own handler through one table. Here `I = $0B` and the byte is `$2E`, so the CPU reads the
+>   word at `$0B2E` and jumps to `$044D`.
+>
+> Mode 2 is also why the trick above works at all: the CPU trusts whatever byte it finds on the bus, and the board
+> makes sure that byte is the MCU's `$2E`.
 
 ## Releasing the other processors
 
@@ -332,6 +402,18 @@ vector, and the sound Z80 is reset and restarted. What each does while the main 
   writes `$37` into `$FC85`. This is the byte the main CPU is polling at `$0158`. The MCU also leaves the
   16-bit sum of its own ROM in `$FC82/$FC83` — it must come out as zero; `PS4` is what the error message calls
   this check — and notes at `$FC7D` whether a coin switch was already closed at power-on.
+
+> [!NOTE]
+> **Checksums**
+> A checksum is the cheapest way to ask whether a block of memory still holds what it held when it was made. The
+> program adds up every byte of a range, letting the total wrap around when it overflows, and compares the result
+> with a value worked out in advance. Change any byte and the total changes with it. A common refinement, used here
+> by the sub CPU and the MCU, is to put one extra balancing value in the ROM, chosen so that the whole sum comes
+> out as zero: the program then only has to test for zero and does not need to store the expected value anywhere.
+>
+> A checksum catches a failing ROM chip, and it also catches a patch: whoever changes the code to remove a check
+> changes the sum. That is why Bubble Bobble's protection does not rely on one checksum at boot but hides
+> twenty-three of them in ordinary routines, each adding up a few bytes at a time (chapter 20).
 
 ## Test mode or game
 
@@ -485,6 +567,21 @@ generator draws tiles from a list of objects, and a "sprite" is just a small gro
 moves by rewriting the list. This chapter is about the tiles themselves: how they are stored, how many there are,
 what they look like, and how the program groups them into the things a player recognises. The next chapter is about
 the list.
+
+> [!NOTE]
+> **Tiles, sprites and bit-planes**
+> Most arcade boards of the mid-1980s build their picture from two kinds of thing. A **tile map** is a grid of 8 x
+> 8 tiles in video RAM: the program writes a tile number into a cell and the hardware draws it there, which makes
+> walls and text cheap, and the whole grid can be scrolled. **Sprites** are a separate set of small pictures,
+> typically 16 x 16, that the hardware draws on top of the grid at any pixel position given in a list, which is how
+> characters move smoothly over the background. Bubble Bobble's board has only the second kind, in an unusual form:
+> everything on the screen, walls and text included, is an entry in the object list (chapter 5).
+>
+> A tile's pixels are stored in **bit-planes**. A pixel with sixteen possible colours needs four bits. Instead of
+> keeping the four bits of each pixel together, the ROMs keep the first bit of every pixel of a row together, then
+> the second bits, and so on: four one-bit pictures, the planes, which are stacked to give each pixel its colour
+> index. On this board planes 0 and 1 are in one half of the graphics ROMs and planes 2 and 3 in the other, so
+> every chip supplies two of the four bits of every pixel it holds.
 
 ## The tile format
 
@@ -750,8 +847,8 @@ What is unusual is the program's naming. In every record of the game — players
 byte the code calls `x` (`IX+1`) is the **vertical** position, and it grows **upwards**: it is 256 minus the
 hardware line of the object's centre. The byte called `y` (`IX+2`) is the horizontal position of the centre.
 Bub standing on the floor of round 1 has `x = 32, y = 32`; his object entry holds `256 - 24 = 232` in byte 0 and
-`24` in byte 2, which puts the 16 x 16 sprite at lines 216-231 and pixels 24-39: the centre is at line 224 = 256
-- 32 and pixel 32. Jumping increases `x`; walking right increases `y`. Whether Taito's engine grew out of a
+`24` in byte 2, which puts the 16 x 16 sprite at lines 216-231 and pixels 24-39: the centre is at line 224 =
+256 - 32 and pixel 32. Jumping increases `x`; walking right increases `y`. Whether Taito's engine grew out of a
 vertically mounted game or the names were simply chosen this way is not recorded; the article uses "up", "down",
 "left" and "right" in the player's sense and quotes `x` and `y` only where the code does.
 
@@ -1238,6 +1335,18 @@ blanked and appends the 0, so every score on screen ends in 0 and the largest re
 There are three of them in work RAM — player 1 at `$E641`, player 2 at `$E646`, the high score at `$E64C` — and
 `add_score` (chapter 16) is the only routine that changes the first two.
 
+> [!NOTE]
+> **Binary-coded decimal**
+> Binary-coded decimal (BCD) stores a number the way it is written rather than the way the CPU counts. Each half of
+> a byte — a nibble, four bits — holds one decimal digit from 0 to 9, so a byte holds two digits and the byte `$50`
+> means fifty, not eighty. The nibble values `$A-$F` are never used.
+>
+> It wastes space — a byte holds 0 to 99 instead of 0 to 255 — but printing becomes trivial: each nibble is already
+> a digit, and the printing routine needs no division by ten, which the Z80, having no divide instruction, would do
+> slowly. Adding is nearly as easy, because the Z80 has an instruction, `DAA`, that corrects the result of an
+> ordinary binary addition back into two decimal digits. Three bytes give six digits; with the implied final zero,
+> that is the 9,999,990 ceiling.
+
 The extra-life thresholds come from a 96-byte table at `$3180`: four entries of eight BCD numbers, selected by
 DIP switch B bits 2-3:
 
@@ -1375,7 +1484,7 @@ oldest entry), re-enables the NMI and returns. The main loop, running with inter
 | --- | --- |
 | `$00-$34` | Play sound number n: look the command up in the table at `$329C` |
 | `$35-$DF` | Ignored |
-| `$EE` | All sound off: `$8FAA = 0`, and every later request is refused until |
+| `$EE` | All sound off: `$8FAA = 0`, and every later request is refused until `$EF` |
 | `$EF` | All sound on |
 | `$F0` | Toggle echo mode: instead of playing, the sound CPU replies each command byte on the latch (a test hook) |
 | `$F2 $F4 $F6 $F8` | Play an entry of a second table at `$3306` (unused by the game) |
@@ -1798,7 +1907,7 @@ MCU's `$2E` selects because `$0B22 + 12 = $0B2E`. The two tables are one:
 0B22  17 1D    task 0  $1D17  task0_game_flow
 0B24  F7 2A    task 1  $2AF7  task1_attract
 0B26  38 05    task 2  $0538  task2_round_loop
-0B28  EF 3D    task 3  $3DEF  task3_enemies
+0B28  EF 3D    task 3  $3DEF  task3_players
 0B2A  A8 85    task 4  0:$85A8 task4_enemies
 0B2C  3B 5B    task 5  $5B3B  task5_bubbles
 0B2E  4D 04    interrupt vector: irq_vblank
@@ -2014,6 +2123,22 @@ one thing the enemy AI cannot do without: where each player is relative to each 
 program service by service, shows which of those services the game actually uses, and ends with the traps
 it sets for anyone who tries to replace it.
 
+> [!NOTE]
+> **Microcontrollers and copy protection**
+> A microcontroller is a whole small computer on one chip: processor, program ROM, RAM and input and output ports.
+> The 6801U4's 4 KB of program is **mask ROM**: it is part of the chip's own circuitry, fixed when the chip is
+> manufactured, and there are no pins through which it can simply be read out.
+>
+> That is what makes it a lock. The rest of Bubble Bobble's program sits in ordinary ROM chips, which anyone with a
+> ROM reader can copy onto blank chips for a copied board. The MCU cannot be copied that way: a bootlegger —
+> someone building unlicensed copies of the board — has to work out what it does from the outside, by watching what
+> it reads and writes and when, and build a replacement that behaves the same. (The bootleggers eventually did,
+> with a different Motorola microcontroller, the 68705; chapter 20.)
+>
+> A protection chip that only answers a challenge can be removed and the check patched out of the program. Taito's
+> answer was to give the MCU real work — the inputs, the frame interrupt, the enemies' geometry — so that a board
+> without it is not a game.
+
 ## The port protocol
 
 The MCU is not on the main CPU's bus. It reaches the 1 KB of shared RAM at `$FC00-$FFFF` — MCU addresses
@@ -2056,8 +2181,8 @@ Addresses below `$0800` select the input latches instead of RAM: `$0000` is DIP 
 switch B, `$0002` the player 1 stick and buttons, `$0003` player 2 and the start buttons. Port 1 carries the
 coin and service switches on its low bits and, on its high bits, the outputs: bit 4 the coin lockout coil,
 bit 5 the coin counter, bit 6 the main CPU's interrupt line, bit 7 the read/write direction. Every byte the
-MCU moves costs it about thirty cycles of port writes; the whole per-frame service list is written around
-that cost.
+MCU moves costs it about fifty cycles — the call, a dozen port and register accesses, the return; the whole
+per-frame service list is written around that cost.
 
 ## Boot and the frame
 
@@ -2276,9 +2401,9 @@ pattern, one `PSHA` too many, sits in an unreachable watcher routine at `$F217` 
 change to the byte at `$FC7F`.
 
 The trap that is armed is the handshake itself. Chapter 3 showed the boot refusing to continue without the
-`$37` at `$FC85`; five more places in the game check it again during play — in the enemy walking code, in the
+`$37` at `$FC85`; the game checks it again during play — among other places in the enemy walking code, in the
 round-start animation, in the bubble-blowing routine, in the map-drawing pass and in a small routine that is
-called from the bubble task — and each responds to a wrong value in its own quiet way. Chapter 20 lists them
+called from the bubble task — and each responds to a wrong value in its own quiet way. Chapter 20 counts them
 with the other protection checks, including the main CPU's own habit of confirming that the interrupt vector
 at `$0B2E` still points at the handler the MCU was designed to trigger.
 
@@ -2366,6 +2491,11 @@ is the whole budget. On the busiest frames the sub CPU is working for more than 
 started at VBLANK: the main CPU's tasks, which begin 1.6 milliseconds later, overlap it for most of that time.
 The map build at round start takes longer than a frame; the main CPU's `load_round_map` yields until the
 acknowledgement comes back, and the VBLANK that arrives meanwhile is simply taken late.
+
+The opposite case is the idle one. The VBLANK signal stays asserted for the whole blanking period (chapter 2),
+about 1.5 milliseconds, so a handler that finishes before the blanking does is entered again at its own `EI`.
+Outside a round, where one pass costs 185 cycles, the handler therefore runs several times in each blanking;
+inside a round a single pass outlasts the blanking.
 
 ## The shared RAM
 
@@ -3112,6 +3242,18 @@ many pixels, one at a time, with the wall tests repeated for each. List 12, the 
 `$11CE`, most of them for the enemies (chapter 17), and they are why the monsters' speeds can be graded so
 finely by the round record: a speed of 12 and a speed of 13 differ by one extra pixel every few frames.
 
+> [!NOTE]
+> **Fractional speeds without fractions**
+> A sprite can only be drawn at whole pixels, but games want speeds in between. The common solution is
+> **fixed-point** arithmetic: the position is kept with an extra byte for the fraction of a pixel, the speed is
+> added to it every frame — 1.2 pixels becomes 1 and 51/256 — and only the whole part is used for drawing. The
+> fraction carries over, and every fifth frame or so the sprite moves one pixel more.
+>
+> Bubble Bobble gets the same result with a table instead of arithmetic. The speed list spells out the pixels to
+> move, frame by frame: `1 1 1 1 2` is 1.2 pixels per frame, written out in full. The table costs a few bytes per
+> speed, but it keeps every position a single whole byte, lets the wall tests run once for every pixel moved, and
+> lets the designers choose exactly on which frames the extra pixels come.
+
 The wall tests are the subject of chapter 15; here it is enough that the cell ahead must be air and one of
 the three cells under the sprite must be solid, or the pixel is not taken and, in the second case, the player
 falls. The map has no rows above `x = $E0`; up there the air-control routine clamps `y` to `$18-$E7` instead
@@ -3228,6 +3370,20 @@ the steps a second table marks, passes up through platforms and lands on the fir
 solid under the sprite's feet on the way down. There is no velocity and no gravity anywhere in the program:
 what feels like an arc is a list of sixty-one numbers read one per step, and what feels like weight is the
 number of steps taken per frame.
+
+> [!NOTE]
+> **How games usually jump**
+> Most platform games model a jump with two numbers. The vertical **velocity** says how far the character moves up
+> or down each frame; **gravity** is a constant subtracted from the velocity each frame. A jump sets the velocity
+> to a large upward value; gravity wears it down to zero at the top of the arc and then makes it more and more
+> negative, so the character falls faster and faster, usually up to a maximum, the **terminal velocity**. The
+> result is a smooth parabola whose shape follows from the numbers: a stronger launch or weaker gravity gives a
+> higher, floatier jump, and many games let the player cut a jump short by releasing the button.
+>
+> Bubble Bobble does none of this. Its arc is written out as a table of movements per step, the same every time,
+> and a fall is a constant one pixel per step. What it gives up is variety; what it gains is a jump whose height
+> and reach are the same everywhere — forty-two pixels up, about thirty-three across — for the round designers to
+> build around.
 
 ## Starting a jump
 
@@ -3891,7 +4047,7 @@ the second and third monsters of a chain fall as better fruit than the first.
 
 ## Popping and chains
 
-Any bubble a player touches on the fin side, falls onto from close above or jumps into is a pop event on the
+Any bubble a player touches from behind (with the fins on its back), falls onto from close above or jumps into is a pop event on the
 sub CPU (chapter 11); the main CPU sees the claim in `[+$1A]` and calls `bubble_start_pop`:
 
 ```asm
@@ -4808,6 +4964,18 @@ to answer "does this happen?" — the 37-in-256 test for an EXTEND bubble is one
 register is stepped once per frame and only per frame, two decisions made in the same frame see the same
 value, and a decision made a frame later sees a value that anyone with the ROM can predict.
 
+> [!NOTE]
+> **Shift-register random numbers**
+> A linear-feedback shift register (LFSR) is the classic cheap way to make numbers that look random. The register's
+> bits are shifted one place along, and the bit shifted in at the end is computed from a couple of the others,
+> usually by XOR. With the right choice of bits a 16-bit register runs through tens of thousands of different
+> values before it repeats, in an order that looks patternless, for a few instructions per step.
+>
+> It is not random at all: the next value is completely determined by the current one, so from any value the whole
+> sequence that follows can be predicted. `rng_lfsr` is a variant — the bit fed into bit 0 is the inverted old bit
+> 15, XORed with bit 4 of the shifted value — and the per-frame counts in `rng_pre` and `rng_step` disturb the
+> register between steps, which breaks up the sequence but makes it no less predictable.
+
 The second source is the Z80's refresh register, read with `LD A,R` at twelve places:
 
 | Where | What it decides |
@@ -4826,6 +4994,18 @@ why the port had to be verified to the cycle: a bubble that lives a second longe
 than in another is not a bug in the bubble code but a slip in the instruction count somewhere before it.
 Bubble Bobble is deterministic in a way that few games are; the randomness is entirely a function of the
 player's inputs and their timing.
+
+> [!NOTE]
+> **The refresh register**
+> The cheap RAM of the 1980s was dynamic RAM, which stores each bit as an electric charge that leaks away within
+> milliseconds unless every row of the chip is read, and so refreshed, regularly. The Z80 was designed to do this
+> for free: after fetching each instruction, while it decodes it, the CPU puts a row address from its `R` register
+> on the address bus for the memory to refresh, and increments `R`.
+>
+> `R` therefore counts instructions: one for each ordinary instruction, two for those with a prefix byte, wrapping
+> around in its low seven bits. A program can read it with `LD A,R`, and because its value depends on how many
+> instructions have run, it looks like a source of chance. It is unpredictable only to someone who cannot count
+> instructions.
 
 What is *not* random is worth listing too, because players assumed it was. The enemies never roll a die:
 every turn, jump and chase is a function of the MCU's geometry bytes and the map. The bonus item is chosen
@@ -5066,7 +5246,7 @@ free record still walks the spawn path.
 
 `scheduler_run` returns to `irq_after_scheduler`: `frame_done = 1`, the interrupted address is checked
 against `$C000`, `RETI`, and the main CPU is back in its two-byte loop with 6.5 milliseconds to spare. The
-sub CPU finished its pass at about 4 milliseconds and has been idle since; the MCU finished its handler at
+sub CPU finished its pass at about 7 milliseconds and has been idle since; the MCU finished its handler at
 about 7.3 milliseconds. The object list built during the tasks is in the shadow at `$E1CD`; it will be
 copied to the hardware at the next VBLANK, and drawn during the frame after that.
 
@@ -5711,8 +5891,8 @@ palette. Chapter 17.
 **Attribute byte.** The fourth byte of an object entry: bits 1-0 select the upper part of the tile number,
 bits 5-2 the colour group, bit 6 flips horizontally, bit 7 vertically. Chapter 4.
 
-**Bank.** One of four 16 KB pages of the main program's ROM switched into `$8000-$BFFF` by the byte at
-`$FA80`. Bank 0 holds the enemy drivers, bank 1 the data (maps, round records, tables), bank 2 the round
+**Bank.** One of four 16 KB pages of the main program's ROM switched into `$8000-$BFFF` by the bank register
+at `$FB40`. Bank 0 holds the enemy drivers, bank 1 the data (maps, round records, tables), bank 2 the round
 objects and messages, bank 3 the story and graphics for the intro. Chapter 3.
 
 **Bolt, lightning.** A bubble record in the flight state that carries lightning: it kills what it touches and
@@ -5741,8 +5921,8 @@ raised by clearing rounds quickly, lowered by dying. Chapter 12.
 **EXTEND.** The six letters that award an extra life when all are collected from EXTEND bubbles; the
 letter is chosen by the MCU's counter. Chapters 10 and 16.
 
-**Frame.** One sixtieth of a second, marked by the VBLANK interrupt; the unit of all timing in the program.
-Chapter 9.
+**Frame.** One vertical blanking period, 1/59.19 of a second, marked by the VBLANK interrupt; the unit of all
+timing in the program. Chapter 9.
 
 **Geometry.** The MCU's per-enemy computation of where the players are relative to it: direction flags and
 distances in the result bytes at `$FC27`. Chapter 10.
@@ -5782,11 +5962,11 @@ palette, layout. Appendix D.
 **RST.** The Z80's one-byte call to a low address; the kernel uses `RST $08` to `RST $30` as its system
 calls: yield, sleep, start a task, and so on. Chapter 9.
 
-**Scheduler.** The kernel's loop that runs each of the six tasks whose state has counted down to zero,
-once per frame. Chapter 9.
+**Scheduler.** The kernel's loop that, once per frame, runs each of the six tasks whose state is 1 and
+counts down the states of those sleeping for a number of frames. Chapter 9.
 
-**Shared RAM.** The 2 KB at `$E000-$E7FF` and the records beyond it that the main and sub CPUs both address,
-and the 1 KB at `$FC00-$FFFF` that the main CPU and the MCU share. Chapters 10 and 11.
+**Shared RAM.** The 6 KB of work RAM at `$E000-$F7FF` that the main and sub CPUs both address, and the 1 KB
+at `$FC00-$FFFF` that the main CPU and the MCU share. Chapters 2, 10 and 11.
 
 **Slot.** A position code that names a sprite's place in the object list and the cells it draws into; each
 record carries one. Chapter 5.

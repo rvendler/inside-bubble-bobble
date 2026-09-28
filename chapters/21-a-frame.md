@@ -146,7 +146,7 @@ free record still walks the spawn path.
 
 `scheduler_run` returns to `irq_after_scheduler`: `frame_done = 1`, the interrupted address is checked
 against `$C000`, `RETI`, and the main CPU is back in its two-byte loop with 6.5 milliseconds to spare. The
-sub CPU finished its pass at about 4 milliseconds and has been idle since; the MCU finished its handler at
+sub CPU finished its pass at about 7 milliseconds and has been idle since; the MCU finished its handler at
 about 7.3 milliseconds. The object list built during the tasks is in the shadow at `$E1CD`; it will be
 copied to the hardware at the next VBLANK, and drawn during the frame after that.
 

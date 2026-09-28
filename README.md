@@ -10,6 +10,10 @@ verified against a cycle-exact emulator and a routine-by-routine port of all fou
 * **[inside-bubble-bobble.md](inside-bubble-bobble.md)** — the same text as one Markdown file.
 * **[chapters/](chapters/)** — one file per chapter, readable directly on GitHub.
 
+The chapters are the source. After editing them, run `python3 build.py` to regenerate the single Markdown file and
+the standalone HTML (`inside-bubble-bobble.html` and its copy `index.html`). Info boxes are written as GitHub notes —
+a blockquote that starts with `> [!NOTE]` and a bold title line — and become shaded boxes in the HTML.
+
 ## Contents
 
 * [Inside Bubble Bobble](chapters/01-introduction.md)

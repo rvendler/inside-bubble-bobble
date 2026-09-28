@@ -72,6 +72,11 @@ started at VBLANK: the main CPU's tasks, which begin 1.6 milliseconds later, ove
 The map build at round start takes longer than a frame; the main CPU's `load_round_map` yields until the
 acknowledgement comes back, and the VBLANK that arrives meanwhile is simply taken late.
 
+The opposite case is the idle one. The VBLANK signal stays asserted for the whole blanking period (chapter 2),
+about 1.5 milliseconds, so a handler that finishes before the blanking does is entered again at its own `EI`.
+Outside a round, where one pass costs 185 cycles, the handler therefore runs several times in each blanking;
+inside a round a single pass outlasts the blanking.
+
 ## The shared RAM
 
 ![The shared 6 KB: what the sub CPU reads and writes.](../img/ch11-shared-ram.svg)
