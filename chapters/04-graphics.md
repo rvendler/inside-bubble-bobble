@@ -7,6 +7,21 @@ moves by rewriting the list. This chapter is about the tiles themselves: how the
 what they look like, and how the program groups them into the things a player recognises. The next chapter is about
 the list.
 
+> [!NOTE]
+> **Tiles, sprites and bit-planes**
+> Most arcade boards of the mid-1980s build their picture from two kinds of thing. A **tile map** is a grid of 8 x
+> 8 tiles in video RAM: the program writes a tile number into a cell and the hardware draws it there, which makes
+> walls and text cheap, and the whole grid can be scrolled. **Sprites** are a separate set of small pictures,
+> typically 16 x 16, that the hardware draws on top of the grid at any pixel position given in a list, which is how
+> characters move smoothly over the background. Bubble Bobble's board has only the second kind, in an unusual form:
+> everything on the screen, walls and text included, is an entry in the object list (chapter 5).
+>
+> A tile's pixels are stored in **bit-planes**. A pixel with sixteen possible colours needs four bits. Instead of
+> keeping the four bits of each pixel together, the ROMs keep the first bit of every pixel of a row together, then
+> the second bits, and so on: four one-bit pictures, the planes, which are stacked to give each pixel its colour
+> index. On this board planes 0 and 1 are in one half of the graphics ROMs and planes 2 and 3 in the other, so
+> every chip supplies two of the four bits of every pixel it holds.
+
 ## The tile format
 
 The graphics ROMs hold 512 KB, of which 384 KB are populated: twelve 32 KB chips at positions 0 to 5 and 8 to 13

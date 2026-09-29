@@ -71,6 +71,18 @@ at `$FC00-$FFFF` is different: the MCU reaches it through a slow parallel interf
 byte), and the main CPU reads it like RAM. There is no locking. The two sides agree on who writes what, and the
 MCU's work runs in a fixed order every frame so that its results are ready when the main program looks.
 
+> [!NOTE]
+> **The watchdog**
+> A watchdog is a timer circuit that runs independently of the program. It counts all the time, and if it ever
+> reaches its limit it resets the board, as if the power had been switched off and on again. The program's side of
+> the bargain is to restart the count — to "kick" the watchdog — often enough that the limit is never reached:
+> Bubble Bobble writes to `$FA80` in every VBLANK and inside every long loop.
+>
+> As long as the program runs normally, nobody notices. If it crashes — a wild jump, a loop that never ends, a
+> corrupted stack — the kicks stop and the watchdog restarts the machine shortly afterwards, instead of leaving a
+> frozen screen in an arcade with nobody there to switch it off. The game also builds two watchdogs of its own in
+> software, each CPU watching a counter that the other increments (chapters 9 and 11).
+
 ## The sub CPU's view
 
 The sub Z80 has its own 32 KB ROM at `$0000-$7FFF` and sees the shared work RAM at `$E000-$F7FF`, the same
@@ -126,6 +138,25 @@ the nine YM3526 channels, each of which has two "voices" in the sound program so
 channel and hand it back, and its most frequent effects — the jump, the bubble — on the YM2203's FM channels, with
 the SSG for a few more. Both chips have programmable timers, and the sound program runs its whole sequencer from
 their interrupts: timer A of the YM2203 paces the YM3526 channels, timer B the YM2203's own.
+
+> [!NOTE]
+> **FM synthesis**
+> The two Yamaha chips make their sound by frequency modulation. The building block is the **operator**: an
+> oscillator producing a sine wave, with an envelope of its own that shapes its loudness over time — how fast it
+> rises when a note starts (attack), how it falls (decay) to the level it holds while the note is held (sustain),
+> and how fast it dies away when the note is let go (release). On its own an operator makes a pure, flute-like
+> tone.
+>
+> FM connects operators so that the output of one wobbles the frequency of another. The modulated wave is no longer
+> a sine: it gains overtones, and how bright, hollow or metallic it sounds depends on the ratio of the two
+> frequencies and on how strongly one modulates the other. Because the modulating operator has its own envelope,
+> the tone can change during a note — a bright attack that mellows, as in a plucked or struck instrument.
+>
+> A channel is a group of operators wired in one of a few fixed patterns, the **algorithm**: two operators per
+> channel on the YM3526 (OPL), four on the YM2203 (OPN), which allows richer sounds. The program starts a note by
+> **keying on** a channel, which starts the envelopes, and ends it by keying off, which sends them into their
+> release. The YM2203's SSG is simpler and older: three square-wave tone generators and a noise generator, the
+> sound of many home computers of the time.
 
 ## Inputs
 

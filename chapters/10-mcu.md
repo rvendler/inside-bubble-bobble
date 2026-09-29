@@ -8,6 +8,22 @@ one thing the enemy AI cannot do without: where each player is relative to each 
 program service by service, shows which of those services the game actually uses, and ends with the traps
 it sets for anyone who tries to replace it.
 
+> [!NOTE]
+> **Microcontrollers and copy protection**
+> A microcontroller is a whole small computer on one chip: processor, program ROM, RAM and input and output ports.
+> The 6801U4's 4 KB of program is **mask ROM**: it is part of the chip's own circuitry, fixed when the chip is
+> manufactured, and there are no pins through which it can simply be read out.
+>
+> That is what makes it a lock. The rest of Bubble Bobble's program sits in ordinary ROM chips, which anyone with a
+> ROM reader can copy onto blank chips for a copied board. The MCU cannot be copied that way: a bootlegger —
+> someone building unlicensed copies of the board — has to work out what it does from the outside, by watching what
+> it reads and writes and when, and build a replacement that behaves the same. (The bootleggers eventually did,
+> with a different Motorola microcontroller, the 68705; chapter 20.)
+>
+> A protection chip that only answers a challenge can be removed and the check patched out of the program. Taito's
+> answer was to give the MCU real work — the inputs, the frame interrupt, the enemies' geometry — so that a board
+> without it is not a game.
+
 ## The port protocol
 
 The MCU is not on the main CPU's bus. It reaches the 1 KB of shared RAM at `$FC00-$FFFF` — MCU addresses
@@ -50,8 +66,8 @@ Addresses below `$0800` select the input latches instead of RAM: `$0000` is DIP 
 switch B, `$0002` the player 1 stick and buttons, `$0003` player 2 and the start buttons. Port 1 carries the
 coin and service switches on its low bits and, on its high bits, the outputs: bit 4 the coin lockout coil,
 bit 5 the coin counter, bit 6 the main CPU's interrupt line, bit 7 the read/write direction. Every byte the
-MCU moves costs it about thirty cycles of port writes; the whole per-frame service list is written around
-that cost.
+MCU moves costs it about fifty cycles — the call, a dozen port and register accesses, the return; the whole
+per-frame service list is written around that cost.
 
 ## Boot and the frame
 
@@ -270,9 +286,9 @@ pattern, one `PSHA` too many, sits in an unreachable watcher routine at `$F217` 
 change to the byte at `$FC7F`.
 
 The trap that is armed is the handshake itself. Chapter 3 showed the boot refusing to continue without the
-`$37` at `$FC85`; five more places in the game check it again during play — in the enemy walking code, in the
+`$37` at `$FC85`; the game checks it again during play — among other places in the enemy walking code, in the
 round-start animation, in the bubble-blowing routine, in the map-drawing pass and in a small routine that is
-called from the bubble task — and each responds to a wrong value in its own quiet way. Chapter 20 lists them
+called from the bubble task — and each responds to a wrong value in its own quiet way. Chapter 20 counts them
 with the other protection checks, including the main CPU's own habit of confirming that the interrupt vector
 at `$0B2E` still points at the handler the MCU was designed to trigger.
 

@@ -44,6 +44,23 @@ which prints `WORK RAM ERROR` and halts with the video on. The same test then ru
 messages are stored as text records right after the code, at `$0234` and `$0244`, together with two more that
 the later checks can print: `PS4 SUM ERROR` and `I/O ERROR`.
 
+> [!NOTE]
+> **The stack**
+> The stack is an area of RAM that the CPU uses as a pile of two-byte values, and the stack pointer register, `SP`,
+> holds the address of the top of the pile. `PUSH` puts a register pair on top (`SP` moves down by two); `POP`
+> takes the top value off again into a register pair (`SP` moves back up). The Z80 uses the same pile for
+> subroutines: `CALL` pushes the address of the instruction after it and jumps, and `RET` pops an address and jumps
+> there. An interrupt pushes the address it interrupted in the same way.
+>
+> Nothing checks that the value `RET` pops is the one `CALL` pushed. Every `PUSH` inside a routine must be matched
+> by a `POP` before its `RET`, or the program "returns" to whatever value happens to be on top. Bubble Bobble uses
+> this twice on purpose: the kernel gives each of its six tasks its own 64-byte stack and switches between tasks by
+> switching `SP` (chapter 9), and the copy protection deliberately leaves an extra value on the stack when a check
+> fails, so that the program goes wrong later and somewhere else (chapter 20).
+>
+> The RAM test above has to run without a stack because the stack lives in the RAM being tested: a `CALL` there
+> would write its return address into memory not yet known to work.
+
 Then the video RAM is cleared (`$C000-$DFFF`, 8 KB, by `mem_clear`), the MCU is given its first command before
 it even runs (`$FF94 = 1`, the coin-lockout command), and the interrupt vector is prepared:
 
@@ -62,6 +79,28 @@ just written with `$2E` — so the vector is `I:$2E = $0B2E`, and the word store
 address of the frame handler. This detail is worth remembering: the value `$0B2E` is checked again and again
 by the copy-protection code in chapter 20, because a bootleg that replaced the MCU with a plain interrupt
 generator would also have had to reproduce this trick.
+
+> [!NOTE]
+> **Interrupts and the Z80's three modes**
+> An interrupt is a signal from outside that makes a processor stop what it is doing, push the address it was at
+> onto the stack, and run a handler; when the handler returns (with `RETI`), the interrupted program carries on as
+> if nothing had happened. A program can refuse interrupts for a while with `DI` and accept them again with `EI`.
+> The Z80 also has a second input, the NMI (non-maskable interrupt), which `DI` cannot block and which always goes
+> to `$0066`; the sound CPU receives its commands that way (chapter 8).
+>
+> For the ordinary interrupt the program chooses, with the `IM` instruction, how the CPU finds its handler:
+>
+> * **Mode 0** (`IM 0`): the interrupting device places an instruction on the data bus and the CPU executes it. It is
+>   a leftover from the Intel 8080, and nothing on this board uses it.
+> * **Mode 1** (`IM 1`): the CPU always calls `$0038`, whoever interrupted it. It is the simplest mode, and the one
+>   the sub Z80 uses (chapter 11).
+> * **Mode 2** (`IM 2`): the CPU forms an address from the `I` register (the high byte) and a byte that the device
+>   puts on the data bus (the low byte), reads the two-byte word stored at that address, and jumps to it. It is meant
+>   to give each device its own handler through one table. Here `I = $0B` and the byte is `$2E`, so the CPU reads the
+>   word at `$0B2E` and jumps to `$044D`.
+>
+> Mode 2 is also why the trick above works at all: the CPU trusts whatever byte it finds on the bus, and the board
+> makes sure that byte is the MCU's `$2E`.
 
 ## Releasing the other processors
 
@@ -103,6 +142,18 @@ vector, and the sound Z80 is reset and restarted. What each does while the main 
   writes `$37` into `$FC85`. This is the byte the main CPU is polling at `$0158`. The MCU also leaves the
   16-bit sum of its own ROM in `$FC82/$FC83` — it must come out as zero; `PS4` is what the error message calls
   this check — and notes at `$FC7D` whether a coin switch was already closed at power-on.
+
+> [!NOTE]
+> **Checksums**
+> A checksum is the cheapest way to ask whether a block of memory still holds what it held when it was made. The
+> program adds up every byte of a range, letting the total wrap around when it overflows, and compares the result
+> with a value worked out in advance. Change any byte and the total changes with it. A common refinement, used here
+> by the sub CPU and the MCU, is to put one extra balancing value in the ROM, chosen so that the whole sum comes
+> out as zero: the program then only has to test for zero and does not need to store the expected value anywhere.
+>
+> A checksum catches a failing ROM chip, and it also catches a patch: whoever changes the code to remove a check
+> changes the sum. That is why Bubble Bobble's protection does not rely on one checksum at boot but hides
+> twenty-three of them in ordinary routines, each adding up a few bytes at a time (chapter 20).
 
 ## Test mode or game
 

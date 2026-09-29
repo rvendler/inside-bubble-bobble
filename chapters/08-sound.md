@@ -22,7 +22,7 @@ oldest entry), re-enables the NMI and returns. The main loop, running with inter
 | --- | --- |
 | `$00-$34` | Play sound number n: look the command up in the table at `$329C` |
 | `$35-$DF` | Ignored |
-| `$EE` | All sound off: `$8FAA = 0`, and every later request is refused until |
+| `$EE` | All sound off: `$8FAA = 0`, and every later request is refused until `$EF` |
 | `$EF` | All sound on |
 | `$F0` | Toggle echo mode: instead of playing, the sound CPU replies each command byte on the latch (a test hook) |
 | `$F2 $F4 $F6 $F8` | Play an entry of a second table at `$3306` (unused by the game) |

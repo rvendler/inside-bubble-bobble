@@ -226,6 +226,18 @@ many pixels, one at a time, with the wall tests repeated for each. List 12, the 
 `$11CE`, most of them for the enemies (chapter 17), and they are why the monsters' speeds can be graded so
 finely by the round record: a speed of 12 and a speed of 13 differ by one extra pixel every few frames.
 
+> [!NOTE]
+> **Fractional speeds without fractions**
+> A sprite can only be drawn at whole pixels, but games want speeds in between. The common solution is
+> **fixed-point** arithmetic: the position is kept with an extra byte for the fraction of a pixel, the speed is
+> added to it every frame — 1.2 pixels becomes 1 and 51/256 — and only the whole part is used for drawing. The
+> fraction carries over, and every fifth frame or so the sprite moves one pixel more.
+>
+> Bubble Bobble gets the same result with a table instead of arithmetic. The speed list spells out the pixels to
+> move, frame by frame: `1 1 1 1 2` is 1.2 pixels per frame, written out in full. The table costs a few bytes per
+> speed, but it keeps every position a single whole byte, lets the wall tests run once for every pixel moved, and
+> lets the designers choose exactly on which frames the extra pixels come.
+
 The wall tests are the subject of chapter 15; here it is enough that the cell ahead must be air and one of
 the three cells under the sprite must be solid, or the pixel is not taken and, in the second case, the player
 falls. The map has no rows above `x = $E0`; up there the air-control routine clamps `y` to `$18-$E7` instead

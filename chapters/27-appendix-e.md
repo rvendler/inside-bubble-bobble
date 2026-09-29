@@ -7,8 +7,8 @@ palette. Chapter 17.
 **Attribute byte.** The fourth byte of an object entry: bits 1-0 select the upper part of the tile number,
 bits 5-2 the colour group, bit 6 flips horizontally, bit 7 vertically. Chapter 4.
 
-**Bank.** One of four 16 KB pages of the main program's ROM switched into `$8000-$BFFF` by the byte at
-`$FA80`. Bank 0 holds the enemy drivers, bank 1 the data (maps, round records, tables), bank 2 the round
+**Bank.** One of four 16 KB pages of the main program's ROM switched into `$8000-$BFFF` by the bank register
+at `$FB40`. Bank 0 holds the enemy drivers, bank 1 the data (maps, round records, tables), bank 2 the round
 objects and messages, bank 3 the story and graphics for the intro. Chapter 3.
 
 **Bolt, lightning.** A bubble record in the flight state that carries lightning: it kills what it touches and
@@ -37,8 +37,8 @@ raised by clearing rounds quickly, lowered by dying. Chapter 12.
 **EXTEND.** The six letters that award an extra life when all are collected from EXTEND bubbles; the
 letter is chosen by the MCU's counter. Chapters 10 and 16.
 
-**Frame.** One sixtieth of a second, marked by the VBLANK interrupt; the unit of all timing in the program.
-Chapter 9.
+**Frame.** One vertical blanking period, 1/59.19 of a second, marked by the VBLANK interrupt; the unit of all
+timing in the program. Chapter 9.
 
 **Geometry.** The MCU's per-enemy computation of where the players are relative to it: direction flags and
 distances in the result bytes at `$FC27`. Chapter 10.
@@ -78,11 +78,11 @@ palette, layout. Appendix D.
 **RST.** The Z80's one-byte call to a low address; the kernel uses `RST $08` to `RST $30` as its system
 calls: yield, sleep, start a task, and so on. Chapter 9.
 
-**Scheduler.** The kernel's loop that runs each of the six tasks whose state has counted down to zero,
-once per frame. Chapter 9.
+**Scheduler.** The kernel's loop that, once per frame, runs each of the six tasks whose state is 1 and
+counts down the states of those sleeping for a number of frames. Chapter 9.
 
-**Shared RAM.** The 2 KB at `$E000-$E7FF` and the records beyond it that the main and sub CPUs both address,
-and the 1 KB at `$FC00-$FFFF` that the main CPU and the MCU share. Chapters 10 and 11.
+**Shared RAM.** The 6 KB of work RAM at `$E000-$F7FF` that the main and sub CPUs both address, and the 1 KB
+at `$FC00-$FFFF` that the main CPU and the MCU share. Chapters 2, 10 and 11.
 
 **Slot.** A position code that names a sprite's place in the object list and the cells it draws into; each
 record carries one. Chapter 5.

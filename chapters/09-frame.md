@@ -245,7 +245,7 @@ MCU's `$2E` selects because `$0B22 + 12 = $0B2E`. The two tables are one:
 0B22  17 1D    task 0  $1D17  task0_game_flow
 0B24  F7 2A    task 1  $2AF7  task1_attract
 0B26  38 05    task 2  $0538  task2_round_loop
-0B28  EF 3D    task 3  $3DEF  task3_enemies
+0B28  EF 3D    task 3  $3DEF  task3_players
 0B2A  A8 85    task 4  0:$85A8 task4_enemies
 0B2C  3B 5B    task 5  $5B3B  task5_bubbles
 0B2E  4D 04    interrupt vector: irq_vblank

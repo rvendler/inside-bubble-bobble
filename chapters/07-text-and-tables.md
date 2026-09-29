@@ -58,6 +58,18 @@ blanked and appends the 0, so every score on screen ends in 0 and the largest re
 There are three of them in work RAM — player 1 at `$E641`, player 2 at `$E646`, the high score at `$E64C` — and
 `add_score` (chapter 16) is the only routine that changes the first two.
 
+> [!NOTE]
+> **Binary-coded decimal**
+> Binary-coded decimal (BCD) stores a number the way it is written rather than the way the CPU counts. Each half of
+> a byte — a nibble, four bits — holds one decimal digit from 0 to 9, so a byte holds two digits and the byte `$50`
+> means fifty, not eighty. The nibble values `$A-$F` are never used.
+>
+> It wastes space — a byte holds 0 to 99 instead of 0 to 255 — but printing becomes trivial: each nibble is already
+> a digit, and the printing routine needs no division by ten, which the Z80, having no divide instruction, would do
+> slowly. Adding is nearly as easy, because the Z80 has an instruction, `DAA`, that corrects the result of an
+> ordinary binary addition back into two decimal digits. Three bytes give six digits; with the implied final zero,
+> that is the 9,999,990 ceiling.
+
 The extra-life thresholds come from a 96-byte table at `$3180`: four entries of eight BCD numbers, selected by
 DIP switch B bits 2-3:
 

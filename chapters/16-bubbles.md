@@ -273,7 +273,7 @@ the second and third monsters of a chain fall as better fruit than the first.
 
 ## Popping and chains
 
-Any bubble a player touches on the fin side, falls onto from close above or jumps into is a pop event on the
+Any bubble a player touches from behind (with the fins on its back), falls onto from close above or jumps into is a pop event on the
 sub CPU (chapter 11); the main CPU sees the claim in `[+$1A]` and calls `bubble_start_pop`:
 
 ```asm
